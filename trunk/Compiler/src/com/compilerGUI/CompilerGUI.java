@@ -1,13 +1,28 @@
 package com.compilerGUI;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
+import javax.swing.JOptionPane;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 
 public class CompilerGUI {
@@ -65,9 +80,52 @@ public class CompilerGUI {
 		menuItem_file.setMenu(menuItem_fileFrame);
 		
 		MenuItem menuItem_fileFrame_openFile = new MenuItem(menuItem_fileFrame, SWT.NONE);
+		menuItem_fileFrame_openFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+			    final String textString;
+			    FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+			    dialog.setFilterExtensions(new String[] {"*.txt"});
+			    String name = dialog.open();
+			    if ((name == null) || (name.length() == 0))
+			    	return;
+			    try {
+			      File file = new File(name);
+			      FileInputStream stream= new FileInputStream(file.getPath());
+			      try {
+			        Reader in = new BufferedReader(new InputStreamReader(stream));
+			        char[] readBuffer= new char[2048];
+			        StringBuffer buffer= new StringBuffer((int) file.length());
+			        int n;
+			        while ((n = in.read(readBuffer)) > 0) {
+			          buffer.append(readBuffer, 0, n);
+			        }
+			        textString = buffer.toString();
+			        stream.close();
+			      } catch (IOException e1) {
+			        MessageBox box = new MessageBox(shell, SWT.ICON_ERROR);
+			        box.setMessage("Error reading file:\n" + name);
+			        box.open();
+			        return;
+			      }
+			    } catch (FileNotFoundException e1) {
+			      MessageBox box = new MessageBox(shell, SWT.ICON_ERROR);
+			      box.setMessage("File not found:\n" + name);
+			      box.open();
+			      return;
+			    }
+			    text_sourceCode.setText(textString);
+			}
+		});
 		menuItem_fileFrame_openFile.setText("\u6253\u5F00\u6587\u4EF6");
 		
 		MenuItem menuItem_fileFrame_exit = new MenuItem(menuItem_fileFrame, SWT.NONE);
+		menuItem_fileFrame_exit.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.exit(0);
+			}
+		});
 		menuItem_fileFrame_exit.setText("\u9000\u51FA");
 		
 		MenuItem menuItem_option = new MenuItem(menu, SWT.CASCADE);
@@ -77,9 +135,23 @@ public class CompilerGUI {
 		menuItem_option.setMenu(menuItem_optionFrame);
 		
 		MenuItem menuItem_optionFrame_lexicalAnalysis = new MenuItem(menuItem_optionFrame, SWT.NONE);
+		menuItem_optionFrame_lexicalAnalysis.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				text_analysis.setText("这是词法分析！");
+				text_statistic.setText("这是词法分析的统计结果！");
+			}
+		});
 		menuItem_optionFrame_lexicalAnalysis.setText("\u8BCD\u6CD5\u5206\u6790");
 		
 		MenuItem menuItem_optionFrame_syntaxAnalysis = new MenuItem(menuItem_optionFrame, SWT.NONE);
+		menuItem_optionFrame_syntaxAnalysis.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				text_analysis.setText("这是语法分析！");
+				text_statistic.setText("这是语法分析的统计结果！");
+			}
+		});
 		menuItem_optionFrame_syntaxAnalysis.setText("\u8BED\u6CD5\u5206\u6790");
 		
 		MenuItem menuItem_optionFrame_semanticAnalysis = new MenuItem(menuItem_optionFrame, SWT.NONE);
@@ -95,6 +167,12 @@ public class CompilerGUI {
 		menuItem_help.setMenu(menuItem_helpFrame);
 		
 		MenuItem menu_helpFrame_about = new MenuItem(menuItem_helpFrame, SWT.NONE);
+		menu_helpFrame_about.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				JOptionPane.showMessageDialog(null,"这是帮助信息!", "系统信息", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 		menu_helpFrame_about.setText("\u5173\u4E8E");
 		
 		SashForm sashForm = new SashForm(shell, SWT.NONE);
