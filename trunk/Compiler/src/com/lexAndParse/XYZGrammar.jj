@@ -84,17 +84,29 @@ TOKEN: /* Identifiers */
 | < #DIGIT : [ "0"-"9" ] >
 | < #LETTER : ["a"-"z", "A"-"Z"] >
 | < #UNDERSCORE : "_" >
-}SimpleNode program(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)         :
+}SimpleNode program(Map<String, Integer> tokenCountMap,
+				   StringBuffer tokenStr)         :
 {/*@bgen(jjtree) Program */
   SimpleNode jjtn000 = new SimpleNode(JJTPROGRAM);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/
+  Integer weight = 0;
+  Integer subWeight = 0;
+}
 {/*@bgen(jjtree) Program */
   try {
 /*@egen*/
-  mainClass(tokenCountMap, tokenStr) (classDecl(tokenCountMap, tokenStr))*
+  subWeight = mainClass(tokenCountMap, tokenStr)
   {
+    weight += subWeight;  }
+  (
+    subWeight = classDecl(tokenCountMap, tokenStr)
+    {
+      weight += subWeight;    }
+  )*
+  {
+    tokenCountMap.put("$weight$", weight);
     return jjtn000;
   }
   < EOF >/*@bgen(jjtree)*/
@@ -120,31 +132,44 @@ TOKEN: /* Identifiers */
 /*@egen*/
 }
 
-void mainClass(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
+Integer mainClass(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
 {/*@bgen(jjtree) MainClass */
   SimpleNode jjtn000 = new SimpleNode(JJTMAINCLASS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/
+  Integer subWeight = 0;
+  Integer temp;
+}
 {/*@bgen(jjtree) MainClass */
   try {
 /*@egen*/
   _class(tokenCountMap, tokenStr) id(tokenCountMap, tokenStr)
   < LBRACE >{tokenStr.append("LBRACE({)\n");}
-  (varOrMethodDecl(tokenCountMap, tokenStr))*
+  (
+    temp = varOrMethodDecl(tokenCountMap, tokenStr)
+    {
+      subWeight += temp;    }
+  )*
   _static(tokenCountMap, tokenStr) _void(tokenCountMap, tokenStr)
   _main(tokenCountMap, tokenStr)
   < LPAREN >{tokenStr.append("LPAREN(() ");}
   < RPAREN >{tokenStr.append("RPAREN()) ");}
   < LBRACE >{tokenStr.append("LBRACE({)\n");}
-  (statement(tokenCountMap, tokenStr))*
+  (
+    temp = statement(tokenCountMap, tokenStr)
+    {
+      subWeight += temp;    }
+  )*
   < RBRACE >{tokenStr.append("RBRACE(})\n");}
-  < RBRACE >/*@bgen(jjtree)*/
-            {
-              jjtree.closeNodeScope(jjtn000, true);
-              jjtc000 = false;
-            }
-/*@egen*/{tokenStr.append("RBRACE(})\n");}/*@bgen(jjtree)*/
+  < RBRACE >{tokenStr.append("RBRACE(})\n");}/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    return subWeight;  }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -167,25 +192,35 @@ void mainClass(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)       
 /*@egen*/
 }
 
-void classDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
+Integer classDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
 {/*@bgen(jjtree) ClassDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTCLASSDECL);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/
+  Integer subWeight = 0;
+  Integer temp;
+}
 {/*@bgen(jjtree) ClassDecl */
   try {
 /*@egen*/
   _class(tokenCountMap, tokenStr) id(tokenCountMap, tokenStr)
   (_extends(tokenCountMap, tokenStr) id(tokenCountMap, tokenStr))?
   < LBRACE >{tokenStr.append("LBRACE({)\n");}
-  (varOrMethodDecl(tokenCountMap, tokenStr))*
-  < RBRACE >/*@bgen(jjtree)*/
-            {
-              jjtree.closeNodeScope(jjtn000, true);
-              jjtc000 = false;
-            }
-/*@egen*/{tokenStr.append("RBRACE(})\n");}/*@bgen(jjtree)*/
+  (
+    temp = varOrMethodDecl(tokenCountMap, tokenStr)
+    {
+      subWeight += temp;    }
+  )*
+  < RBRACE >{tokenStr.append("RBRACE(})\n");}/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    return subWeight;
+  }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -208,12 +243,15 @@ void classDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)       
 /*@egen*/
 }
 
-void varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)                 :
+Integer varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)                 :
 {/*@bgen(jjtree) VarOrMethodDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTVARORMETHODDECL);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/
+  Integer subWeight = 0;
+  Integer temp;
+}
 {/*@bgen(jjtree) VarOrMethodDecl */
   try {
 /*@egen*/
@@ -221,43 +259,49 @@ void varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) 
   id(tokenCountMap, tokenStr)
   (
     (
-      < SEMICOLON >/*@bgen(jjtree)*/
-                   {
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
-                   }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
+      < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
     | assign(tokenStr)
       (
         exp(tokenCountMap, tokenStr)
       | < LSQPAREN >{tokenStr.append("LSQPAREN([) ");}
         expList(tokenCountMap, tokenStr)
         < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");}
-      ) < SEMICOLON >/*@bgen(jjtree)*/
-                     {
-                       jjtree.closeNodeScope(jjtn000, true);
-                       jjtc000 = false;
-                     }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
-  )
-| (
-  	< LPAREN >{tokenStr.append("LPAREN(() ");}
-  	formalList(tokenCountMap, tokenStr)
-  	< RPAREN >{tokenStr.append("RPAREN()) ");}
-  	< LBRACE >{tokenStr.append("LBRACE({)\n");}
-  	preDecl(tokenCountMap, tokenStr) postDecl(tokenCountMap, tokenStr)
-  	(statement(tokenCountMap, tokenStr))*
-  	_return(tokenCountMap, tokenStr)
-  	exp(tokenCountMap, tokenStr)
-  	< SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
-  	< RBRACE >/*@bgen(jjtree)*/
-                  {
-                    jjtree.closeNodeScope(jjtn000, true);
-                    jjtc000 = false;
-                  }
-/*@egen*/{tokenStr.append("RBRACE(})\n");}
-  )
-)/*@bgen(jjtree)*/
+      ) < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
+    )/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+    {
+      return 1;    }
+  | (
+	  < LPAREN >{tokenStr.append("LPAREN(() ");}
+	  formalList(tokenCountMap, tokenStr)
+	  < RPAREN >{tokenStr.append("RPAREN()) ");}
+	  < LBRACE >{tokenStr.append("LBRACE({)\n");}
+	  preDecl(tokenCountMap, tokenStr) postDecl(tokenCountMap, tokenStr)
+	  (
+	  	temp = statement(tokenCountMap, tokenStr)
+	  	{	  	  subWeight += temp;
+	  	}
+	  )*
+	  _return(tokenCountMap, tokenStr)
+	  exp(tokenCountMap, tokenStr)
+	  {
+	  	subWeight += 1;	  }
+	  < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
+	  < RBRACE >{tokenStr.append("RBRACE(})\n");}
+	)/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+	  return subWeight;
+	}
+  )/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -280,7 +324,7 @@ void varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) 
 /*@egen*/
 }
 
-void mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)             :
+Integer mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)             :
 {/*@bgen(jjtree) Mid_VarDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTMID_VARDECL);
   boolean jjtc000 = true;
@@ -291,25 +335,22 @@ void mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)     
 /*@egen*/
   type(tokenCountMap, tokenStr) id(tokenCountMap, tokenStr)
   (
-    < SEMICOLON >/*@bgen(jjtree)*/
-                 {
-                   jjtree.closeNodeScope(jjtn000, true);
-                   jjtc000 = false;
-                 }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
+    < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
   | assign(tokenStr)
     (
       exp(tokenCountMap, tokenStr)
     | < LSQPAREN >{tokenStr.append("LSQPAREN([) ");}
       expList(tokenCountMap, tokenStr)
       < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");}
-    ) < SEMICOLON >/*@bgen(jjtree)*/
-                   {
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
-                   }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
+    ) < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
   )/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    return 1;  }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -484,54 +525,80 @@ void type(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)      :
 /*@egen*/
 }
 
-void statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
+Integer statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)           :
 {/*@bgen(jjtree) Statement */
   SimpleNode jjtn000 = new SimpleNode(JJTSTATEMENT);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/
+  Integer temp;
+  Integer subWeight = 0;
+}
 {/*@bgen(jjtree) Statement */
   try {
 /*@egen*/
-  mid_varDecl(tokenCountMap, tokenStr)
+  subWeight = mid_varDecl(tokenCountMap, tokenStr)/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    return subWeight;  }
 | < LBRACE >{tokenStr.append("LBRACE({) ");}
-  (statement(tokenCountMap, tokenStr))*
+  (
+    temp = statement(tokenCountMap, tokenStr)
+    {
+      subWeight += temp;    }
+  )*
   < RBRACE >/*@bgen(jjtree)*/
             {
               jjtree.closeNodeScope(jjtn000, true);
               jjtc000 = false;
             }
-/*@egen*/{tokenStr.append("RBRACE(}) ");}
+/*@egen*/{tokenStr.append("RBRACE(}) ");return subWeight;}
 | _if(tokenCountMap, tokenStr)
   < LPAREN > {tokenStr.append("LPAREN(() ");} exp(tokenCountMap, tokenStr)
-  < RPAREN > {tokenStr.append("RPAREN()) ");} statement(tokenCountMap, tokenStr)
-  _else(tokenCountMap, tokenStr) statement(tokenCountMap, tokenStr)
+  < RPAREN > {tokenStr.append("RPAREN()) ");}
+  temp = statement(tokenCountMap, tokenStr)
+  {
+    subWeight = temp;  }
+  _else(tokenCountMap, tokenStr)
+  temp = statement(tokenCountMap, tokenStr)/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    subWeight += temp;
+    subWeight = subWeight * 2;
+    return subWeight;  }
 | _while(tokenCountMap, tokenStr)
   < LPAREN >{tokenStr.append("LPAREN(() ");} exp(tokenCountMap, tokenStr)
-  < RPAREN >{tokenStr.append("RPAREN()) ");} statement(tokenCountMap, tokenStr)
+  < RPAREN >{tokenStr.append("RPAREN()) ");}
+  temp = statement(tokenCountMap, tokenStr)/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    subWeight = temp * 4;
+    return subWeight;  }
 | id(tokenCountMap, tokenStr)
   (
     (
       id(tokenCountMap, tokenStr)
       (
-        < SEMICOLON >/*@bgen(jjtree)*/
-                     {
-                       jjtree.closeNodeScope(jjtn000, true);
-                       jjtc000 = false;
-                     }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
+        < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
         | assign(tokenStr)
         (
           exp(tokenCountMap, tokenStr)
         | < LSQPAREN >{tokenStr.append("LSQRAREN([) ");}
           expList(tokenCountMap, tokenStr)
           < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");}
-        ) < SEMICOLON >/*@bgen(jjtree)*/
-                       {
-                         jjtree.closeNodeScope(jjtn000, true);
-                         jjtc000 = false;
-                       }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");}
+        ) < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");}
       )
     )
   | (
@@ -541,14 +608,16 @@ void statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)       
       exp(tokenCountMap, tokenStr)
       < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");}
       assign(tokenStr) exp(tokenCountMap, tokenStr)
-      < SEMICOLON >/*@bgen(jjtree)*/
-                   {
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
-                   }
-/*@egen*/{tokenStr.append("SEMICOLON(;)\n");})
+      < SEMICOLON >{tokenStr.append("SEMICOLON(;)\n");})
   	)
   )/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    return 1;  }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -1265,6 +1334,38 @@ void length(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)        :
     }
   }
 /*@egen*/}
+void _main(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)      :
+{/*@bgen(jjtree) Main */
+  SimpleNode jjtn000 = new SimpleNode(JJTMAIN);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) Main */
+  try {
+/*@egen*/
+  < MAIN >/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+    Integer i = tokenCountMap.get("Keywords: " + "main");
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Keywords: " + "main", i);
+    tokenStr.append("MAIN ");
+  }/*@bgen(jjtree)*/
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
+}
 void _long(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)      :
 {/*@bgen(jjtree) Long */
   SimpleNode jjtn000 = new SimpleNode(JJTLONG);
@@ -1413,37 +1514,6 @@ void _void(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)      :
     i++;
     tokenCountMap.put("Keywords: " + "void", i);
     tokenStr.append("VOID ");
-  }/*@bgen(jjtree)*/
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
-/*@egen*/}
-void _main(Map<String, Integer> tokenCountMap, StringBuffer tokenStr)      :
-{/*@bgen(jjtree) Main */
-  SimpleNode jjtn000 = new SimpleNode(JJTMAIN);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) Main */
-  try {
-/*@egen*/
-  < MAIN >/*@bgen(jjtree)*/
-  {
-    jjtree.closeNodeScope(jjtn000, true);
-    jjtc000 = false;
-  }
-/*@egen*/
-  {
-    Integer i = tokenCountMap.get("Keywords: " + "main");
-    if (i == null)
-    {
-      i = 0;
-    }
-    i++;
-    tokenCountMap.put("Keywords: " + "main", i);
-    tokenStr.append("MAIN ");
   }/*@bgen(jjtree)*/
   } finally {
     if (jjtc000) {

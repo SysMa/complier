@@ -36,12 +36,12 @@ public interface XYZCompilerTreeConstants
   public int JJTLARGERTHAN = 30;
   public int JJTDOT = 31;
   public int JJTLENGTH = 32;
-  public int JJTLONG = 33;
-  public int JJTBOOLEAN = 34;
-  public int JJTCLASS = 35;
-  public int JJTSTATIC = 36;
-  public int JJTVOID = 37;
-  public int JJTMAIN = 38;
+  public int JJTMAIN = 33;
+  public int JJTLONG = 34;
+  public int JJTBOOLEAN = 35;
+  public int JJTCLASS = 36;
+  public int JJTSTATIC = 37;
+  public int JJTVOID = 38;
   public int JJTEXTENDS = 39;
   public int JJTRETURN = 40;
   public int JJTIF = 41;
@@ -87,12 +87,12 @@ public interface XYZCompilerTreeConstants
     "Largerthan",
     "Dot",
     "Length",
+    "Main",
     "Long",
     "Boolean",
     "Class",
     "Static",
     "Void",
-    "Main",
     "Extends",
     "Return",
     "If",
@@ -104,4 +104,4 @@ public interface XYZCompilerTreeConstants
     "False",
   };
 }
-/* JavaCC - OriginalChecksum=6970658adbbcca210b91341293806c8e (do not edit this line) */
+/* JavaCC - OriginalChecksum=ca613e5e62a47a80d48875b079022edb (do not edit this line) */

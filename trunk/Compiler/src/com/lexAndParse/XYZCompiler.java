@@ -26,13 +26,16 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
     }
   }
 
-  final public SimpleNode program(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public SimpleNode program(Map<String, Integer> tokenCountMap,
+                                   StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) Program */
   SimpleNode jjtn000 = new SimpleNode(JJTPROGRAM);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  jjtree.openNodeScope(jjtn000);Integer weight = 0;
+  Integer subWeight = 0;
     try {
-      mainClass(tokenCountMap, tokenStr);
+      subWeight = mainClass(tokenCountMap, tokenStr);
+    weight += subWeight;
       label_1:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -43,8 +46,10 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_la1[0] = jj_gen;
           break label_1;
         }
-        classDecl(tokenCountMap, tokenStr);
+        subWeight = classDecl(tokenCountMap, tokenStr);
+      weight += subWeight;
       }
+    tokenCountMap.put("$weight$", weight);
     {if (true) return jjtn000;}
       jj_consume_token(0);
     } catch (Throwable jjte000) {
@@ -69,11 +74,12 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
     throw new Error("Missing return statement in function");
   }
 
-  final public void mainClass(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public Integer mainClass(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) MainClass */
   SimpleNode jjtn000 = new SimpleNode(JJTMAINCLASS);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
+  Integer temp;
     try {
       _class(tokenCountMap, tokenStr);
       id(tokenCountMap, tokenStr);
@@ -92,7 +98,8 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_la1[1] = jj_gen;
           break label_2;
         }
-        varOrMethodDecl(tokenCountMap, tokenStr);
+        temp = varOrMethodDecl(tokenCountMap, tokenStr);
+      subWeight += temp;
       }
       _static(tokenCountMap, tokenStr);
       _void(tokenCountMap, tokenStr);
@@ -119,14 +126,16 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_la1[2] = jj_gen;
           break label_3;
         }
-        statement(tokenCountMap, tokenStr);
+        temp = statement(tokenCountMap, tokenStr);
+      subWeight += temp;
       }
       jj_consume_token(RBRACE);
              tokenStr.append("RBRACE(})\u005cn");
       jj_consume_token(RBRACE);
-              jjtree.closeNodeScope(jjtn000, true);
-              jjtc000 = false;
              tokenStr.append("RBRACE(})\u005cn");
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return subWeight;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -146,13 +155,15 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void classDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public Integer classDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) ClassDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTCLASSDECL);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
+  Integer temp;
     try {
       _class(tokenCountMap, tokenStr);
       id(tokenCountMap, tokenStr);
@@ -180,12 +191,14 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_la1[4] = jj_gen;
           break label_4;
         }
-        varOrMethodDecl(tokenCountMap, tokenStr);
+        temp = varOrMethodDecl(tokenCountMap, tokenStr);
+      subWeight += temp;
       }
       jj_consume_token(RBRACE);
-              jjtree.closeNodeScope(jjtn000, true);
-              jjtc000 = false;
              tokenStr.append("RBRACE(})\u005cn");
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return subWeight;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -205,13 +218,15 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public Integer varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) VarOrMethodDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTVARORMETHODDECL);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
+  Integer temp;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BOOLEAN:
@@ -234,8 +249,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case SEMICOLON:
           jj_consume_token(SEMICOLON);
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
                     tokenStr.append("SEMICOLON(;)\u005cn");
           break;
         case ASSIGN:
@@ -265,8 +278,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
             throw new ParseException();
           }
           jj_consume_token(SEMICOLON);
-                       jjtree.closeNodeScope(jjtn000, true);
-                       jjtc000 = false;
                       tokenStr.append("SEMICOLON(;)\u005cn");
           break;
         default:
@@ -274,15 +285,18 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_consume_token(-1);
           throw new ParseException();
         }
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+      {if (true) return 1;}
         break;
       case LPAREN:
         jj_consume_token(LPAREN);
-                   tokenStr.append("LPAREN(() ");
+                     tokenStr.append("LPAREN(() ");
         formalList(tokenCountMap, tokenStr);
         jj_consume_token(RPAREN);
-                   tokenStr.append("RPAREN()) ");
+                     tokenStr.append("RPAREN()) ");
         jj_consume_token(LBRACE);
-                   tokenStr.append("LBRACE({)\u005cn");
+                     tokenStr.append("LBRACE({)\u005cn");
         preDecl(tokenCountMap, tokenStr);
         postDecl(tokenCountMap, tokenStr);
         label_5:
@@ -301,16 +315,19 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
             jj_la1[8] = jj_gen;
             break label_5;
           }
-          statement(tokenCountMap, tokenStr);
+          temp = statement(tokenCountMap, tokenStr);
+                  subWeight += temp;
         }
         _return(tokenCountMap, tokenStr);
         exp(tokenCountMap, tokenStr);
+                subWeight += 1;
         jj_consume_token(SEMICOLON);
-                      tokenStr.append("SEMICOLON(;)\u005cn");
+                        tokenStr.append("SEMICOLON(;)\u005cn");
         jj_consume_token(RBRACE);
-                    jjtree.closeNodeScope(jjtn000, true);
-                    jjtc000 = false;
-                   tokenStr.append("RBRACE(})\u005cn");
+                     tokenStr.append("RBRACE(})\u005cn");
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+          {if (true) return subWeight;}
         break;
       default:
         jj_la1[9] = jj_gen;
@@ -336,9 +353,10 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public Integer mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) Mid_VarDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTMID_VARDECL);
   boolean jjtc000 = true;
@@ -349,8 +367,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
         jj_consume_token(SEMICOLON);
-                   jjtree.closeNodeScope(jjtn000, true);
-                   jjtc000 = false;
                   tokenStr.append("SEMICOLON(;)\u005cn");
         break;
       case ASSIGN:
@@ -380,8 +396,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           throw new ParseException();
         }
         jj_consume_token(SEMICOLON);
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
                     tokenStr.append("SEMICOLON(;)\u005cn");
         break;
       default:
@@ -389,6 +403,9 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
         jj_consume_token(-1);
         throw new ParseException();
       }
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return 1;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -408,6 +425,7 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
+    throw new Error("Missing return statement in function");
   }
 
   final public void formalList(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
@@ -614,17 +632,21 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
     }
   }
 
-  final public void statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+  final public Integer statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) Statement */
   SimpleNode jjtn000 = new SimpleNode(JJTSTATEMENT);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  jjtree.openNodeScope(jjtn000);Integer temp;
+  Integer subWeight = 0;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BOOLEAN:
       case INTEGER:
       case LONG:
-        mid_varDecl(tokenCountMap, tokenStr);
+        subWeight = mid_varDecl(tokenCountMap, tokenStr);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return subWeight;}
         break;
       case LBRACE:
         jj_consume_token(LBRACE);
@@ -645,12 +667,13 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
             jj_la1[18] = jj_gen;
             break label_7;
           }
-          statement(tokenCountMap, tokenStr);
+          temp = statement(tokenCountMap, tokenStr);
+      subWeight += temp;
         }
         jj_consume_token(RBRACE);
               jjtree.closeNodeScope(jjtn000, true);
               jjtc000 = false;
-             tokenStr.append("RBRACE(}) ");
+             tokenStr.append("RBRACE(}) ");{if (true) return subWeight;}
         break;
       case IF:
         _if(tokenCountMap, tokenStr);
@@ -659,9 +682,15 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
         exp(tokenCountMap, tokenStr);
         jj_consume_token(RPAREN);
               tokenStr.append("RPAREN()) ");
-        statement(tokenCountMap, tokenStr);
+        temp = statement(tokenCountMap, tokenStr);
+    subWeight = temp;
         _else(tokenCountMap, tokenStr);
-        statement(tokenCountMap, tokenStr);
+        temp = statement(tokenCountMap, tokenStr);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    subWeight += temp;
+    subWeight = subWeight * 2;
+    {if (true) return subWeight;}
         break;
       case WHILE:
         _while(tokenCountMap, tokenStr);
@@ -670,7 +699,11 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
         exp(tokenCountMap, tokenStr);
         jj_consume_token(RPAREN);
              tokenStr.append("RPAREN()) ");
-        statement(tokenCountMap, tokenStr);
+        temp = statement(tokenCountMap, tokenStr);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    subWeight = temp * 4;
+    {if (true) return subWeight;}
         break;
       case ID:
         id(tokenCountMap, tokenStr);
@@ -680,8 +713,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case SEMICOLON:
             jj_consume_token(SEMICOLON);
-                       jjtree.closeNodeScope(jjtn000, true);
-                       jjtc000 = false;
                       tokenStr.append("SEMICOLON(;)\u005cn");
             break;
           case ASSIGN:
@@ -711,8 +742,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
               throw new ParseException();
             }
             jj_consume_token(SEMICOLON);
-                         jjtree.closeNodeScope(jjtn000, true);
-                         jjtc000 = false;
                         tokenStr.append("SEMICOLON(;)\u005cn");
             break;
           default:
@@ -738,8 +767,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
             assign(tokenStr);
             exp(tokenCountMap, tokenStr);
             jj_consume_token(SEMICOLON);
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
                     tokenStr.append("SEMICOLON(;)\u005cn");
             break;
           default:
@@ -753,6 +780,9 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
           jj_consume_token(-1);
           throw new ParseException();
         }
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return 1;}
         break;
       default:
         jj_la1[23] = jj_gen;
@@ -778,6 +808,7 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
+    throw new Error("Missing return statement in function");
   }
 
   final public void exp(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
@@ -1476,6 +1507,30 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
     }
   }
 
+  final public void _main(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
+ /*@bgen(jjtree) Main */
+  SimpleNode jjtn000 = new SimpleNode(JJTMAIN);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+    try {
+      jj_consume_token(MAIN);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    Integer i = tokenCountMap.get("Keywords: " + "main");
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Keywords: " + "main", i);
+    tokenStr.append("MAIN ");
+    } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+    }
+  }
+
   final public void _long(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
  /*@bgen(jjtree) Long */
   SimpleNode jjtn000 = new SimpleNode(JJTLONG);
@@ -1589,30 +1644,6 @@ public class XYZCompiler/*@bgen(jjtree)*/implements XYZCompilerTreeConstants, XY
     i++;
     tokenCountMap.put("Keywords: " + "void", i);
     tokenStr.append("VOID ");
-    } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-    }
-  }
-
-  final public void _main(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) throws ParseException {
- /*@bgen(jjtree) Main */
-  SimpleNode jjtn000 = new SimpleNode(JJTMAIN);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-    try {
-      jj_consume_token(MAIN);
-    jjtree.closeNodeScope(jjtn000, true);
-    jjtc000 = false;
-    Integer i = tokenCountMap.get("Keywords: " + "main");
-    if (i == null)
-    {
-      i = 0;
-    }
-    i++;
-    tokenCountMap.put("Keywords: " + "main", i);
-    tokenStr.append("MAIN ");
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);

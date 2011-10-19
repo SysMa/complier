@@ -74,6 +74,18 @@ class SimpleNode implements Node {
       }
     }
   }
+  
+  public void dump(String prefix, StringBuffer parseTree){
+	parseTree.append(toString(prefix) + "\n");
+	if (children != null){
+	  for (int i = 0; i < children.length; ++i) {
+		SimpleNode n = (SimpleNode) children[i];
+		if (n != null) {
+		  n.dump(prefix + " ", parseTree);
+	    }
+	  }
+	}
+  }
 }
 
 /* JavaCC - OriginalChecksum=61ce4d86df6ecf5ba092d78724a2495a (do not edit this line) */
