@@ -37,6 +37,10 @@ public class CompilerGUI {
 	private Text text_sourceCode;
 	private Text text_analysis;
 	private Text text_statistic;
+	
+	private XYZCompiler xyzCompiler = null;
+	private SimpleNode parseTreeRoot = null;
+	private Integer weight = 0;
 
 	/**
 	 * Launch the application.
@@ -145,15 +149,16 @@ public class CompilerGUI {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String input = text_sourceCode.getText();
-				XYZCompiler xyzCompiler = 
-					new XYZCompiler(new ByteArrayInputStream(input.getBytes()));
+				xyzCompiler = new XYZCompiler(new ByteArrayInputStream(input.getBytes()));
 				Map<String, Integer> tokenCountMap = new HashMap<String, Integer>();
-				StringBuffer tokenStr = new StringBuffer("这是词法分析！\n");
+				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
 				try
 			    {
-			      xyzCompiler.program(tokenCountMap, tokenStr);
+				  parseTreeRoot = xyzCompiler.program(tokenCountMap, tokenStr);
+				  weight = tokenCountMap.get("$weight$");
+				  tokenCountMap.remove("$weight$");
 			      text_analysis.setText(tokenStr.toString());
-			      String statistic = "这是词法分析的统计结果！\n数目\t\t关键字或变量\n";
+			      String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
 			      for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
 			          i.hasNext();){
 			    	  String key = i.next();
@@ -175,8 +180,18 @@ public class CompilerGUI {
 		menuItem_optionFrame_syntaxAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				text_analysis.setText("这是语法分析！");
-				text_statistic.setText("这是语法分析的统计结果！");
+				if (xyzCompiler == null){
+					text_analysis.setText("请先进行词法分析！");
+					text_statistic.setText("");
+				}
+				else{
+					StringBuffer parseTree = 
+						new StringBuffer("这是生成的语法分析树:\n");
+					parseTreeRoot.dump("", parseTree);
+					text_analysis.setText(parseTree.toString());
+					text_statistic.setText("该语法分析树的总权重:" + weight);
+					xyzCompiler = null;
+				}
 			}
 		});
 		menuItem_optionFrame_syntaxAnalysis.setText("\u8BED\u6CD5\u5206\u6790");
