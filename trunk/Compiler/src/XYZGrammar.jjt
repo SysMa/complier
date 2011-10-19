@@ -1,385 +1,0 @@
-/**
- * JJTree template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
- */options{  JDK_VERSION = "1.5";  static = false;}PARSER_BEGIN(XYZCompiler)
-public class XYZCompiler{
-  import java.util.HashMap;
-  import java.util.Map;
-    public static void main(String args [])  {    System.out.println("Reading from standard input...");    System.out.print("Enter an expression like \"1+(2+3)*var;\" :");
-    Map<String, Integer> tokenCountMap = new HashMap<String, Integer>();    XYZCompiler xyzc = new XYZCompiler(System.in);    try    {      SimpleNode n = xyzc.program(tokenCountMap);      n.dump("");      System.out.println("Thank you.");    }    catch (Exception e)    {      System.out.println("Oops.");      System.out.println(e.getMessage());    }  }}PARSER_END(XYZCompiler)SKIP :
-{
-  " "
-| "\r"
-| "\t"
-| "\n"
-| "\r\n"
-| < "//"(~["\n", "\r"])*("\n" | "\r" | "\r\n") > // note of '//' 
-| < "/*"(~["*"])*"*"(~["/"](~["*"])*"*")*"/" > // note of '/**/'
-}
-
-TOKEN: /* Integer literals */
-{
-  < INTEGER_LITERAL : ["1"-"9"](< DIGIT >)* | "0" >
-}
-
-TOKEN: /* Long literals */
-{
-  < LONG_LITERAL : < INTEGER_LITERAL >"L" >
-}
-
-TOKEN: /* Keywords */
-{
-  < LPAREN : "(" >
-| < RPAREN : ")" >
-| < LSQPAREN : "[" >
-| < RSQPAREN : "]" >
-| < LBRACE : "{" >
-| < RBRACE : "}" >
-| < SEMICOLON : ";" >
-| < DOT : "." >
-| < ASSIGN : "<=" >
-| < LESSTHAN : "<" >
-| < LARGERTHAN : ">">
-| < PLUS : "+" >
-| < MINUS : "-" >
-| < MUL :"*">
-| < DIVISION : "/">
-| < AND : "&&" > 
-| < OR : "||">
-| < NOT : "!" > 
-| < COMMA : ",">
-| < COLON : ":">
-| < BOOLEAN : "boolean" > 
-| < CLASS : "class" >
-| < ELSE : "else" >
-| < EXTENDS : "extends" >
-| < FALSE : "false" >
-| < IF : "if" >
-| < WHILE : "while" >
-| < INTEGER : "int" > 
-| < LONG : "long" >
-| < NEW : "new" >
-| < RETURN : "return" >
-| < STATIC : "static" >
-| < THIS : "this" >
-| < TRUE : "true" >
-| < VOID : "void" > 
-| < PRE : "pre">
-| < POST : "post">
-
-| < LENGTH : "length" >
-| < MAIN : "main" >
-}
-
-TOKEN: /* IDentifiers */
-{
-  < ID : < LETTER >
-| < LETTER >(< LETTER > | < DIGIT > | < UNDERSCORE >)* >
-| < #DIGIT : [ "0"-"9" ] >
-| < #LETTER : ["a"-"z", "A"-"Z"] >
-| < #UNDERSCORE : "_" >
-}SimpleNode program(Map<String, Integer> tokenCountMap) #Program:
-{}
-{
-  mainClass() (classDecl())*
-  {
-    return jjtThis;
-  }
-  < EOF >
-}
-
-void mainClass() #MainClass:
-{}
-{
-  _class() id() < LBRACE > (varOrMethodDecl())* _static() _void()
-  _main() < LPAREN > < RPAREN > < LBRACE > (statement())* < RBRACE > < RBRACE >
-}
-
-void classDecl() #ClassDecl:
-{}
-{
-  _class() id()
-  (_extends() id())?
-  < LBRACE > (varOrMethodDecl())* < RBRACE >    
-}
-
-void varOrMethodDecl() #VarOrMethodDecl:
-{}
-{
-  (type() | id())
-  id()
-  (
-    (
-      < SEMICOLON >
-    | assign()
-      (
-        exp() | < LSQPAREN > expList() < RSQPAREN >
-      ) < SEMICOLON >
-  )
-| (
-  	< LPAREN > formalList() < RPAREN >
-  	< LBRACE > preDecl() postDecl() (statement())*
-  	_return() exp() < SEMICOLON > < RBRACE >
-  )
-)
-}
-
-void mid_varDecl() #Mid_VarDecl:
-{}
-{
-  type() id()
-  (
-    < SEMICOLON >
-  | assign()
-    (
-      exp() | < LSQPAREN > expList() < RSQPAREN >
-    ) < SEMICOLON >
-  )
-}
-
-void formalList() #FormalList:
-{}
-{
-  (type() | id())
-  id() (< COMMA > (type() | id()) id())*
-}
-
-void preDecl() #PreDecl:
-{}
-{
-  pre() < COLON > exp() < SEMICOLON >
-}
-
-void postDecl() #PostDecl:
-{}
-{
-  post() < COLON > exp() < SEMICOLON >
-}
-
-void type() #Type:
-{}
-{
-  integer() (< LSQPAREN > < RSQPAREN >)?
-| _long() (< LSQPAREN > < RSQPAREN >)?
-| _boolean()
-}
-
-void statement() #Statement:
-{}
-{
-  mid_varDecl()
-| < LBRACE > (statement())* < RBRACE >
-| _if() < LPAREN > exp() < RPAREN > statement() _else() statement()
-| _while() < LPAREN > exp() < RPAREN > statement()
-| id()
-  (
-    (
-      id() < LPAREN > formalList() < RPAREN >
-      < LBRACE > preDecl() postDecl()
-      (statement())* _return() exp() < SEMICOLON > < RBRACE >
-    )
-  | (
-      (assign() exp() < SEMICOLON >)
-    | (< LSQPAREN > exp() < RSQPAREN > assign() exp()< SEMICOLON >)
-  	)
-  )
-}
-
-void exp() #Exp:
-{}
-{
-  _new()
-  (
-    (
-      (integer() | _long()) < LSQPAREN > exp() < RSQPAREN >
-    )
-  | (id() < LPAREN > < RPAREN >)
-  )
-| unaryExp()
-  (
-    (
-      < LSQPAREN > exp() < RSQPAREN >
-    | dot() (length() | id() < LPAREN > expList() < RPAREN > )
-    )
-  | lowLevelExp()
-  ) 
-| not() exp()
-}
-
-void lowLevelExp() #LowLevelExp:
-{}
-{
-  highLevelExp()
-  (    (
-      and()
-    | or()
-    | plus()
-    | minus()
-    )
-    unaryExp()
-    highLevelExp()
-  )*}
-
-void highLevelExp() #HighLevelExp:
-{}
-{
-  (
-    (
-      lessthan()
-    | largerthan()
-    | multi()
-    | division()    )
-    unaryExp()  )*}
-
-void unaryExp() #UnaryExp:
-{}
-{
-  long_literal()
-| int_literal()
-| _true()
-| _false()
-| id()
-| _this()
-| < LPAREN > exp() < RPAREN >
-}
-
-void expList() #ExpList:
-{}
-{
-  exp() (< COMMA > exp())*
-}
-
-void long_literal() #Long_Literal:
-{}
-{
-  < LONG_LITERAL >}
-void int_literal() #Int_Literal:
-{}
-{
-  < INTEGER_LITERAL >}
-void id() #ID:
-{}
-{
-  < ID >}
-void assign() #Assign:
-{}
-{
-  < ASSIGN >
-}
-void pre() #Pre:
-{}
-{
-  < PRE >
-}
-void post() #Post:
-{}
-{
-  < POST >
-}
-void integer() #Integer:
-{}
-{
-  < INTEGER >}
-void not() #Not:
-{}
-{
-  < NOT >}
-void and() #And:
-{}
-{
-  < AND >}
-void or() #Or:
-{}
-{
-  < OR >}
-void plus() #Plus:
-{}
-{
-  < PLUS >}
-void minus() #Minus:
-{}
-{
-  < MINUS >}
-void multi() #Multi:
-{}
-{
-  < MUL >}
-void division() #Division:
-{}
-{
-  < DIVISION >}
-void lessthan() #Lessthan:
-{}
-{
-  < LESSTHAN >}
-void largerthan() #Largerthan:
-{}
-{
-  < LARGERTHAN >}
-void dot() #Dot:
-{}
-{
-  < DOT >}
-void length() #Length:
-{}
-{
-  < LENGTH >}
-void _long() #Long:
-{}
-{
-  < LONG >}
-void _boolean() #Boolean:
-{}
-{
-  < BOOLEAN >}
-void _class() #Class:
-{}
-{
-  < CLASS >}
-void _static() #Static:
-{}
-{
-  < STATIC >}
-void _void() #Void:
-{}
-{
-  < VOID >}
-void _main() #Main:
-{}
-{
-  < MAIN >}
-void _extends() #Extends:
-{}
-{
-  < EXTENDS >}
-void _return() #Return:
-{}
-{
-  < RETURN >}
-void _if() #If:
-{}
-{
-  < IF >}
-void _else() #Else:
-{}
-{
-  < ELSE >}
-void _while() #While:
-{}
-{
-  < WHILE >}
-void _new() #New:
-{}
-{
-  < NEW >}
-void _this() #This:
-{}
-{
-  < THIS >}
-void _true() #True:
-{}
-{
-  < TRUE >}
-void _false() #False:
-{}
-{
-  < FALSE >}

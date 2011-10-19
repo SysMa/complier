@@ -1,12 +1,18 @@
 package com.compilerGUI;
 
+import com.lexAndParse.*;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -65,7 +71,7 @@ public class CompilerGUI {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setImage(SWTResourceManager.getImage("icon\\eclipse.png"));
+		shell.setImage(SWTResourceManager.getImage("icon/eclipse.png"));
 		shell.setSize(690, 491);
 		shell.setText("\u7F16\u8BD1\u5668");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -138,8 +144,29 @@ public class CompilerGUI {
 		menuItem_optionFrame_lexicalAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				text_analysis.setText("这是词法分析！");
-				text_statistic.setText("这是词法分析的统计结果！");
+				String input = text_sourceCode.getText();
+				XYZCompiler xyzCompiler = 
+					new XYZCompiler(new ByteArrayInputStream(input.getBytes()));
+				Map<String, Integer> tokenCountMap = new HashMap<String, Integer>();
+				StringBuffer tokenStr = new StringBuffer("这是词法分析！\n");
+				try
+			    {
+			      xyzCompiler.program(tokenCountMap, tokenStr);
+			      text_analysis.setText(tokenStr.toString());
+			      String statistic = "这是词法分析的统计结果！\n数目\t\t关键字或变量\n";
+			      for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
+			          i.hasNext();){
+			    	  String key = i.next();
+			    	  statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
+			      }
+				  text_statistic.setText(statistic);
+			    }
+			    catch (Exception e2)
+			    {
+			      System.out.println("Oops.");
+			      text_analysis.setText(e2.getMessage());
+			      text_statistic.setText("");
+			    }
 			}
 		});
 		menuItem_optionFrame_lexicalAnalysis.setText("\u8BCD\u6CD5\u5206\u6790");

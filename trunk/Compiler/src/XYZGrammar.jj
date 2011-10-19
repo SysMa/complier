@@ -1,192 +1,0 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
- */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(eg1)
-public class eg1{  public static void main(String args []) throws ParseException  {    eg1 parser = new eg1(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (eg1.program())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        eg1.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(eg1)SKIP :{  " "| "\r"| "\t"| "\n"
-| "\r\n"
-| < "//"(~["\n", "\r"])*("\n" | "\r" | "\r\n") > // note of '//' 
-| < "/*"(~["*"])*"*"(~["/"](~["*"])*"*")*"/" > // note of '/**/'}TOKEN : {  < #DIGIT : [ "0"-"9" ] >
-| < #LETTER : ["a"-"z", "A"-"Z"] >
-| < #UNDERSCORE : "_" >}
-
-TOKEN: /* Integer literals */
-{
-  < INTEGER_LITERAL : ["1"-"9"](< DIGIT >)* | "0" >}
-
-TOKEN: /* Long literals */
-{
-  < LONG_LITERAL : < INTEGER_LITERAL >"L" >}
-
-TOKEN: /* Keywords */
-{
-  < LPAREN : "(" >
-| < RPAREN : ")" >
-| < LSQPAREN : "[" >
-| < RSQPAREN : "]" >
-| < LBRACE : "{" >
-| < RBRACE : "}" >
-| < SEMICOLON : ";" >
-| < DOT : "." >
-| < ASSIGN : "<=" >
-| < LESSTHAN : "<" >
-| < LARGERTHAN : ">">
-| < PLUS : "+" >
-| < MINUS : "-" >
-| < MUL :"*">
-| < DIVISION : "/">
-| < AND : "&&" > 
-| < OR : "||">
-| < NOT : "!" > 
-| < COMMA : ",">
-| < COLON : ":">
-| < BOOLEAN : "boolean" > 
-| < CLASS : "class" >
-| < ELSE : "else" >
-| < EXTENDS : "extends" >
-| < FALSE : "false" >
-| < IF : "if" >
-| < WHILE : "while" >
-| < INTEGER : "int" > 
-| < LONG : "long" >
-| < NEW : "new" >
-| < RETURN : "return" >
-| < STATIC : "static" >
-| < THIS : "this" >
-| < TRUE : "true" >
-| < VOID : "void" > 
-| < PRE : "pre">
-| < POST : "post">
-
-| < LENGTH : "length" >
-| < MAIN : "main" >}
-
-//TOKEN: /* Types *///{//  < Type : < INTEFER >//| < LONG >//| < BOOLEAN >//| < INTEFER >"[]"//| < LONG >"[]"//| < ID > >//}
-
-//TOKEN://{//  < INT : "int" >//| < LONG : "long" >//| < BOOLEAN : "boolean" >//}
-
-TOKEN: /* IDentifiers */
-{
-  < ID : < LETTER >
-| < LETTER >(< LETTER > | < DIGIT > | < UNDERSCORE >)* >
-}
-
-int program():
-{}
-{
-  mainClass() (classDecl())*
-  {    return 0;  }}
-void mainClass():
-{}
-{
-  < CLASS > < ID > < LBRACE > (varDecl())* (methodDecl())* < STATIC > < VOID >
-  < MAIN > < LPAREN > < RPAREN > < LBRACE > (statement())* < RBRACE > < RBRACE >}
-
-void classDecl():
-{}
-{
-  < CLASS > < ID >
-  (
-    < EXTENDS > < ID >
-  )?
-  < LBRACE > (varDecl())* (methodDecl())* < RBRACE >    }
-
-void varDecl():
-{}
-{
-  (
-    type() | < ID >
-  )
-  < ID >
-  (    < SEMICOLON >
-  | < ASSIGN > (exp() | < LSQPAREN > expList() < RSQPAREN >) < SEMICOLON >
-  )}
-
-void mid_varDecl():
-{}
-{
-  type() < ID >
-  (
-    < SEMICOLON >
-  | < ASSIGN > (exp() | < LSQPAREN > expList() < RSQPAREN >) < SEMICOLON >
-  )}
-
-void methodDecl():
-{}
-{
-  (    type() | < ID >
-  )
-  < ID > < LPAREN > formalList() < RPAREN >
-  < LBRACE > preDecl() postDecl() (statement())* < RETURN > exp() < SEMICOLON > < RBRACE >}
-
-void formalList():
-{}
-{
-  (    type() | < ID >
-  )
-  < ID > (formalRest())*}
-
-void formalRest():
-{}
-{
-  < COMMA > (type() | < ID >) < ID >}
-
-void preDecl():
-{}
-{
-  < PRE > < COLON > exp() < SEMICOLON >}
-
-void postDecl():
-{}
-{
-  < POST > < COLON > exp() < SEMICOLON >}
-
-void type():
-{}
-{
-  < INTEGER > (< LSQPAREN > < RSQPAREN >)?
-| < LONG > (< LSQPAREN > < RSQPAREN >)?
-| < BOOLEAN >}
-
-void statement():
-{}
-{
-  mid_varDecl()
-| < LBRACE > (statement())* < RBRACE >
-| < IF > < LPAREN > exp() < RPAREN > statement() < ELSE > statement()
-| < WHILE > < LPAREN > exp() < RPAREN > statement()
-| < ID >
-  (
-    (      < ID > < LPAREN > formalList() < RPAREN >
-      < LBRACE > preDecl() postDecl() (statement())* < RETURN > exp() < SEMICOLON > < RBRACE >
-    )
-  | ((< ASSIGN > exp() < SEMICOLON >)
-  	| (< LSQPAREN > exp() < RSQPAREN > < ASSIGN > exp()< SEMICOLON >)
-  	)
-  )}
-
-void exp():
-{}
-{
-  mid_exp()  (    (    < LESSTHAN >    | < LARGERTHAN>    | < PLUS>	| < MINUS>	| < MUL>	| < DIVISION>	| < AND > 	| < OR >  )  exp()| < LSQPAREN > exp() < RSQPAREN >| < DOT > (< LENGTH > | < ID > < LPAREN > expList() < RPAREN > ))}
-
-void mid_exp():
-{}
-{
-  < LONG_LITERAL >
-| < INTEGER_LITERAL >
-| < TRUE >
-| < FALSE >
-| < ID >
-| < THIS >
-| < NEW > (((< INTEGER > | < LONG >) < LSQPAREN > exp() < RSQPAREN >) | (< ID > < LPAREN > < RPAREN >))
-| < NOT > exp()
-| < LPAREN > exp() < RPAREN >}
-
-void expList():
-{}
-{
-  exp() (expRest())*}
-
-void expRest():
-{}
-{
-  < COMMA > exp()}
