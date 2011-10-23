@@ -196,7 +196,7 @@ Integer varOrMethodDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenSt
   )
 }
 
-Integer mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Mid_VarDecl:
+Integer mid_varDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #VarDecl:
 {}
 {
   type(tokenCountMap, tokenStr) id(tokenCountMap, tokenStr)
@@ -243,13 +243,17 @@ void postDecl(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #PostDe
 void type(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Type:
 {}
 {
-  integer(tokenCountMap, tokenStr)
-  (< LSQPAREN >{tokenStr.append("LSQPAREN([) ");}
-   < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");})?
-| _long(tokenCountMap, tokenStr)
-  (< LSQPAREN >{tokenStr.append("LSQPAREN([) ");}
-   < RSQPAREN >{tokenStr.append("RSQPAREN(]) ");})?
-| _boolean(tokenCountMap, tokenStr)
+  LOOKAHEAD(3)
+  (    integerArray(tokenCountMap, tokenStr)
+  | longArray(tokenCountMap, tokenStr)
+  )
+| 
+  LOOKAHEAD(1)
+  (
+    integer(tokenCountMap, tokenStr)
+  | _long(tokenCountMap, tokenStr)
+  | _boolean(tokenCountMap, tokenStr)
+  )
 }
 
 Integer statement(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Statement:
@@ -332,7 +336,8 @@ void exp(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Exp:
     < LPAREN >{tokenStr.append("LPAREN(() ");}
     < RPAREN >{tokenStr.append("RPAREN()) ");})
   )
-| unaryExp(tokenCountMap, tokenStr)
+| (LOOKAHEAD(2)
+  unaryExp(tokenCountMap, tokenStr)
   (
     (
       < LSQPAREN >{tokenStr.append("LSQPAREN([) ");}
@@ -346,8 +351,8 @@ void exp(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Exp:
         < RPAREN >{tokenStr.append("RPAREN()) ");}
       )
     )
-  | lowLevelExp(tokenCountMap, tokenStr)
-  ) 
+  )
+  | LOOKAHEAD(1) lowLevelExp(tokenCountMap, tokenStr))
 | not(tokenStr) exp(tokenCountMap, tokenStr)
 }
 
@@ -360,14 +365,14 @@ void lowLevelExp(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Low
     | or(tokenStr)
     | plus(tokenStr)
     | minus(tokenStr)
-    )
-    unaryExp(tokenCountMap, tokenStr)
+    )  
     highLevelExp(tokenCountMap, tokenStr)
   )*}
 
 void highLevelExp(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #HighLevelExp:
 {}
 {
+  unaryExp(tokenCountMap, tokenStr)
   (
     (
       lessthan(tokenStr)
@@ -475,6 +480,21 @@ void integer(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Integer
     tokenCountMap.put("Keywords: " + "int", i);
     tokenStr.append("INT ");
   }}
+void integerArray(Map<String, Integer> tokenCountMap,
+	StringBuffer tokenStr) #IntegerArray:
+{}
+{
+  < INTEGER > < LSQPAREN > < RSQPAREN >
+  {
+    Integer i = tokenCountMap.get("Keywords: " + "int");
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Keywords: " + "int", i);
+    tokenStr.append("INTARRAY ");
+  }}
 void not(StringBuffer tokenStr) #Not:
 {}
 {
@@ -577,6 +597,20 @@ void _long(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Long:
     i++;
     tokenCountMap.put("Keywords: " + "long", i);
     tokenStr.append("LONG ");
+  }}
+void longArray(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #LongArray:
+{}
+{
+  < LONG > < LSQPAREN > < RSQPAREN >
+  {
+    Integer i = tokenCountMap.get("Keywords: " + "long");
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Keywords: " + "long", i);
+    tokenStr.append("LONGARRAY ");
   }}
 void _boolean(Map<String, Integer> tokenCountMap, StringBuffer tokenStr) #Boolean:
 {}
