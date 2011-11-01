@@ -192,7 +192,7 @@ public class CompilerGUI {
 //				Parser parser = new Parser(
 //						new ByteArrayInputStream(input.getBytes()));
 				if (textChanged){
-					text_analysis.setText("源文件已发生个更改，请重新进行词法分析！");
+					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
 					text_statistic.setText("");
 					textChanged = false;
 				}
@@ -215,7 +215,6 @@ public class CompilerGUI {
 					}
 					catch (Exception e2)
 				    {
-				      System.out.println("Oops.");
 				      text_analysis.setText(e2.getMessage());
 				      text_statistic.setText("");
 				    }
