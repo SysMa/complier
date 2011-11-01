@@ -161,24 +161,22 @@ public class CompilerGUI {
 				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
 				LexicalAnalyzer la = new LexicalAnalyzer(
 						new ByteArrayInputStream(input.getBytes()));
-				if (!lexicalOk){
-					try{
-						tokenStr.append(la.getTokenString(tokenCountMap));
-						text_analysis.setText(tokenStr.toString());
-						String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
-						for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
-			          		i.hasNext();){
-							String key = i.next();
-							statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
-						}
-						text_statistic.setText(statistic);
-						tokenSource = la.getTokenSource();
-						lexicalOk = true;
+				try{
+					tokenStr.append(la.getTokenString(tokenCountMap));
+					text_analysis.setText(tokenStr.toString());
+					String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
+					for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
+			          	i.hasNext();){
+						String key = i.next();
+						statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
 					}
-					catch (Exception e2){
-						text_analysis.setText(e2.getMessage());
-						text_statistic.setText("");
-					}
+					text_statistic.setText(statistic);
+					tokenSource = la.getTokenSource();
+					lexicalOk = true;
+				}
+				catch (Exception e2){
+					text_analysis.setText(e2.getMessage());
+					text_statistic.setText("");
 				}
 			}
 		});
@@ -255,6 +253,7 @@ public class CompilerGUI {
 			}
 		});
 		text_sourceCode.setText("Take an XYZ program as the input.");
+		textChanged = false;
 		
 		SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
