@@ -1,6 +1,9 @@
 package com.compilerGUI;
 
-import com.lexAndParse.*;
+import com.lexical.LexicalAnalyzer;
+import com.lexical.Token;
+import com.parse.Parser;
+import com.parse.SimpleNode;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -10,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,6 +33,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.ModifyEvent;
 
 
 public class CompilerGUI {
@@ -38,9 +44,11 @@ public class CompilerGUI {
 	private Text text_analysis;
 	private Text text_statistic;
 	
-	private XYZCompiler xyzCompiler = null;
-	private SimpleNode parseTreeRoot = null;
-	private Integer weight = 0;
+	private boolean textChanged = false;
+	private boolean lexicalOk = false;
+	private boolean parseOk = false;
+	
+	private ArrayList<Token> tokenSource = new ArrayList<Token>();
 
 	/**
 	 * Launch the application.
@@ -149,29 +157,29 @@ public class CompilerGUI {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String input = text_sourceCode.getText();
-				xyzCompiler = new XYZCompiler(new ByteArrayInputStream(input.getBytes()));
 				Map<String, Integer> tokenCountMap = new HashMap<String, Integer>();
 				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
-				try
-			    {
-				  parseTreeRoot = xyzCompiler.program(tokenCountMap, tokenStr);
-				  weight = tokenCountMap.get("$weight$");
-				  tokenCountMap.remove("$weight$");
-			      text_analysis.setText(tokenStr.toString());
-			      String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
-			      for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
-			          i.hasNext();){
-			    	  String key = i.next();
-			    	  statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
-			      }
-				  text_statistic.setText(statistic);
-			    }
-			    catch (Exception e2)
-			    {
-			      System.out.println("Oops.");
-			      text_analysis.setText(e2.getMessage());
-			      text_statistic.setText("");
-			    }
+				LexicalAnalyzer la = new LexicalAnalyzer(
+						new ByteArrayInputStream(input.getBytes()));
+				if (!lexicalOk){
+					try{
+						tokenStr.append(la.getTokenString(tokenCountMap));
+						text_analysis.setText(tokenStr.toString());
+						String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
+						for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
+			          		i.hasNext();){
+							String key = i.next();
+							statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
+						}
+						text_statistic.setText(statistic);
+						tokenSource = la.getTokenSource();
+						lexicalOk = true;
+					}
+					catch (Exception e2){
+						text_analysis.setText(e2.getMessage());
+						text_statistic.setText("");
+					}
+				}
 			}
 		});
 		menuItem_optionFrame_lexicalAnalysis.setText("\u8BCD\u6CD5\u5206\u6790");
@@ -180,17 +188,37 @@ public class CompilerGUI {
 		menuItem_optionFrame_syntaxAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (xyzCompiler == null){
+//				String input = text_sourceCode.getText();
+//				Parser parser = new Parser(
+//						new ByteArrayInputStream(input.getBytes()));
+				if (textChanged){
+					text_analysis.setText("源文件已发生个更改，请重新进行词法分析！");
+					text_statistic.setText("");
+					textChanged = false;
+				}
+				else if (!lexicalOk){
 					text_analysis.setText("请先进行词法分析！");
 					text_statistic.setText("");
 				}
-				else{
+				else if(!parseOk){
+					Parser parser = new Parser(tokenSource);
 					StringBuffer parseTree = 
 						new StringBuffer("这是生成的语法分析树:\n");
-					parseTreeRoot.dump("", parseTree);
-					text_analysis.setText(parseTree.toString());
-					text_statistic.setText("该语法分析树的总权重:" + weight);
-					xyzCompiler = null;
+					Map<String, Integer> weightMap = new HashMap<String, Integer>();
+					try{
+						SimpleNode parseTreeRoot = parser.program(weightMap);
+						parseTreeRoot.dump("", parseTree);
+						Integer weight = weightMap.get("$weight$");
+						text_analysis.setText(parseTree.toString());
+						text_statistic.setText("该语法分析树的总权重:" + weight);
+						parseOk = true;
+					}
+					catch (Exception e2)
+				    {
+				      System.out.println("Oops.");
+				      text_analysis.setText(e2.getMessage());
+				      text_statistic.setText("");
+				    }
 				}
 			}
 		});
@@ -220,6 +248,13 @@ public class CompilerGUI {
 		SashForm sashForm = new SashForm(shell, SWT.NONE);
 		
 		text_sourceCode = new Text(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
+		text_sourceCode.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				lexicalOk = false;
+				parseOk = false;
+				textChanged = true;
+			}
+		});
 		text_sourceCode.setText("Take an XYZ program as the input.");
 		
 		SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);

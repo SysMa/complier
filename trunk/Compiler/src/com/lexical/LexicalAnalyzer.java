@@ -1,10 +1,12 @@
 package com.lexical;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 	public LexicalAnalyzerTokenManager token_source;
 	SimpleCharStream jj_input_stream;
+	ArrayList<Token> tokenSource = new ArrayList<Token>();
 	
 	/** Constructor with InputStream. */
 	public LexicalAnalyzer(java.io.InputStream stream) {
@@ -39,6 +41,7 @@ public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 				case INTEGER_LITERAL:
 				case LONG_LITERAL:
 					tokenStr += "<" + tokenImage[t.kind] + ", " + t.image + ">";
+					tokenSource.add(t);
 					break;
 				case BOOLEAN:
 				case CLASS:
@@ -69,6 +72,7 @@ public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 					    tokenCountMap.put("Keywords: " + t.image, i);
 					    tokenStr += "<" 
 					    		 + tokenImage[t.kind].replaceAll("\"", "") + ">";
+					    tokenSource.add(t);
 					}
 					break;
 				case ID:
@@ -81,18 +85,25 @@ public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 					    i++;
 					    tokenCountMap.put("Identifiers: " + t.image, i);
 					    tokenStr += "<id, " + t.image + ">";
+					    tokenSource.add(t);
 					}
 					break;
 				default:
 					tokenStr += "<" + tokenImage[t.kind].replaceAll("\"", "") + ">";
+					tokenSource.add(t);
 					break;
 				}
 			}
+			tokenSource.add(t);
 		}
 		catch (Error e){
 			throw new Exception(e.getMessage());
 		}
 		return tokenStr;
+	}
+	
+	public ArrayList<Token> getTokenSource(){
+		return tokenSource;
 	}
 
 }
