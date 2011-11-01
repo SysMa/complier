@@ -230,6 +230,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           case INTEGER_LITERAL:
           case LONG_LITERAL:
           case LPAREN:
+          case NOT:
           case FALSE:
           case NEW:
           case THIS:
@@ -338,6 +339,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         case INTEGER_LITERAL:
         case LONG_LITERAL:
         case LPAREN:
+        case NOT:
         case FALSE:
         case NEW:
         case THIS:
@@ -668,6 +670,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             case INTEGER_LITERAL:
             case LONG_LITERAL:
             case LPAREN:
+            case NOT:
             case FALSE:
             case NEW:
             case THIS:
@@ -798,6 +801,10 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       case TRUE:
       case ID:
         lowLevelExp();
+        break;
+      case NOT:
+        jj_consume_token(NOT);
+        exp();
         break;
       default:
         jj_la1[26] = jj_gen;
@@ -1582,13 +1589,6 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_3R_13() {
-    if (jj_scan_token(INTEGER)) return true;
-    if (jj_scan_token(LSQPAREN)) return true;
-    if (jj_scan_token(RSQPAREN)) return true;
-    return false;
-  }
-
   private boolean jj_3_1() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1616,6 +1616,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     return false;
   }
 
+  private boolean jj_3R_13() {
+    if (jj_scan_token(INTEGER)) return true;
+    if (jj_scan_token(LSQPAREN)) return true;
+    if (jj_scan_token(RSQPAREN)) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public TokenManager token_source;
   /** Current token. */
@@ -1634,7 +1641,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x80000000,0x40000000,0x40004000,0x0,0x40000000,0x40000000,0x1700,0x50000,0x40004000,0x50400,0x1700,0x50000,0x40000000,0x10000000,0x40000000,0x0,0x40000000,0x40000000,0x40004000,0x1700,0x50000,0x41000,0x41000,0x40004000,0x0,0x0,0x700,0x6600000,0x6600000,0x1980000,0x1980000,0x700,0x0,0x21000,0x21000,0x10000000,};
+      jj_la1_0 = new int[] {0x80000000,0x40000000,0x40004000,0x0,0x40000000,0x40000000,0x8001700,0x50000,0x40004000,0x50400,0x8001700,0x50000,0x40000000,0x10000000,0x40000000,0x0,0x40000000,0x40000000,0x40004000,0x8001700,0x50000,0x41000,0x41000,0x40004000,0x0,0x0,0x8000700,0x6600000,0x6600000,0x1980000,0x1980000,0x700,0x0,0x21000,0x21000,0x10000000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x20060,0x20078,0x2,0x20060,0x20060,0x20c84,0x0,0x20078,0x0,0x20c84,0x0,0x20060,0x0,0x20060,0x60,0x60,0x60,0x20078,0x20c84,0x0,0x0,0x20000,0x20078,0x60,0x20060,0x20c84,0x0,0x0,0x0,0x0,0x20c04,0x28000,0x0,0x0,0x0,};
@@ -1661,6 +1668,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   public void ReInit(ArrayList<Token> tokenSource) {
      ReInit(tokenSource, null);
   }
+
   /** Reinitialise. */
   public void ReInit(ArrayList<Token> tokenSource, String encoding) {
     token_source.ReInit(tokenSource);

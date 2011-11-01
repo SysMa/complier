@@ -85,5 +85,3 @@ class SimpleNode implements Node {
 	}
   }
 }
-
-/* JavaCC - OriginalChecksum=61ce4d86df6ecf5ba092d78724a2495a (do not edit this line) */

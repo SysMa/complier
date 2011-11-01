@@ -173,6 +173,7 @@ public class CompilerGUI {
 					text_statistic.setText(statistic);
 					tokenSource = la.getTokenSource();
 					lexicalOk = true;
+					textChanged = false;
 				}
 				catch (Exception e2){
 					text_analysis.setText(e2.getMessage());
