@@ -137,6 +137,8 @@ public class CompilerGUI {
 		});
 		menuItem_fileFrame_openFile.setText("\u6253\u5F00\u6587\u4EF6");
 		
+		new MenuItem(menuItem_fileFrame, SWT.SEPARATOR);
+		
 		MenuItem menuItem_fileFrame_exit = new MenuItem(menuItem_fileFrame, SWT.NONE);
 		menuItem_fileFrame_exit.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -258,10 +260,10 @@ public class CompilerGUI {
 		
 		SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
-		text_analysis = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
+		text_analysis = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		text_analysis.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a token stream. Show appropriate warning messages for illegal identifiers or tokens. \r\nNote: Any words such as \"5x\" and \"2y\", must be reported as an illegal identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a parse tree (or an abstract syntax tree) for this program. Show appropriate warning messages for syntax errors.\r\nNote: A program passing lexical analysis may fail during the syntactical analysis.  Then you need to display the results in the lexical analysis.");
 		
-		text_statistic = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
+		text_statistic = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		text_statistic.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AShow the occurrence times of each keyword or identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1ACalculate the weight of a parse tree.");
 		sashForm_1.setWeights(new int[] {1, 1});
 		sashForm.setWeights(new int[] {1, 1});
