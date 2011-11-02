@@ -9,7 +9,7 @@ import com.lexical.Token;
 public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnalyzerConstants {/*@bgen(jjtree)*/
   protected JJTParserState jjtree = new JJTParserState();
 
-  final public SimpleNode program(Map<String, Integer> tokenCountMap) throws ParseException,Exception {
+  final public SimpleNode program(Map<String, Integer> tokenCountMap) throws ParseException {
  /*@bgen(jjtree) Program */
   SimpleNode jjtn000 = new SimpleNode(JJTPROGRAM);
   boolean jjtc000 = true;
@@ -32,9 +32,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       weight += subWeight;
       }
     if (jj_ntk != 0){
-    	throw new Exception("Error at Line " + token.next.beginLine + ", Column "
-    			+ token.next.beginColumn + ", encountered '" + token.next.image + 
-    			"'.\n" + "\tThe parser ends before it reaches the end of the file.");
+    	throw new ParseException(token, 
+    			ParseException.ENDS_BEFORE_EOF);
     }
     tokenCountMap.put("$weight$", weight);
     {if (true) return jjtn000;}
@@ -51,9 +50,6 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     }
     if (jjte000 instanceof ParseException) {
       {if (true) throw (ParseException)jjte000;}
-    }
-    if (jjte000 instanceof Exception){
-    	{if(true) throw (Exception)jjte000;}
     }
     {if (true) throw (Error)jjte000;}
     } finally {

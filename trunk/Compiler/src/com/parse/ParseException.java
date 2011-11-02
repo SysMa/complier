@@ -55,6 +55,20 @@ public class ParseException extends Exception {
   public ParseException(String message) {
     super(message);
   }
+  
+  /** The error code. */
+  public static int ENDS_BEFORE_EOF = 0;
+  
+  /** The error message responding to the error code. */
+  private static String[] errorMsg = {
+		  "The parser ends before it reaches the end of the file."
+  };
+  
+  public ParseException(Token token, 
+		  				int errorcode){
+	  super(initialise(token, errorcode));
+	  currentToken = token;
+  }
 
 
   /**
@@ -179,11 +193,24 @@ public class ParseException extends Exception {
     retval += expected;
     return retval;
   }
+  
+  /**
+   * It uses "token" and "errorcode" to get the error message
+   * and returns it.
+   */
+  private static String initialise(Token token, int errorcode){
+	  String message = "Error at Line " + token.next.beginLine
+		 + ", Column " + token.next.beginColumn
+		 + "; Encountered '" + token.next.image
+		 + "'. " + eol + "\t";
+	  message += errorMsg[errorcode];
+	  return message;
+  }
 
   /**
    * The end of line string for this machine.
    */
-  protected String eol = System.getProperty("line.separator", "\n");
+  protected static String eol = System.getProperty("line.separator", "\n");
 
   /**
    * Used to convert raw characters to their escaped version
