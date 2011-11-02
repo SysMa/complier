@@ -263,7 +263,7 @@ public class CompilerGUI {
 		
 		text_statistic = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
 		text_statistic.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AShow the occurrence times of each keyword or identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1ACalculate the weight of a parse tree.");
-		sashForm_1.setWeights(new int[] {1, 1});
+		sashForm_1.setWeights(new int[] {1, 1, 1});
 		sashForm.setWeights(new int[] {1, 1});
 
 	}

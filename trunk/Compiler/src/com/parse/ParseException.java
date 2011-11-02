@@ -77,6 +77,60 @@ public class ParseException extends Exception {
    * defined in the generated ...Constants interface.
    */
   public String[] tokenImage;
+  
+//  static String[] errorMsg = {
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "an integer literal like 2.",
+//	  "a long literal like 2L.",
+//	  "an open (.",
+//	  "a close ).",
+//	  "an open [.",
+//	  "a close ].",
+//	  "an open {.",
+//	  "a close }.",
+//	  "a simicolon ';' for the end of a statement.",
+//	  "none",
+//	  "an assign symbol '<=' for an assignment statement.",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "a colon ':' followed the pre-post statement.",
+//	  "none",
+//	  "a class declaration like 'class temp{}'.",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "none",
+//	  "a type 'int'.",
+//	  "a type 'long'.",
+//	  "none",
+//	  "a return statement like 'return 3;' for the function.",
+//	  "a main function declaration like 'static void main()' for entering the program",
+//	  "none",
+//	  "none",
+//	  "a 'void' to implement the main function declaration 'static void main()'.",
+//	  "a pre condition statement like 'pre:expression;' in front of the function.",
+//	  "a post condition statement 'post:expression;' follow the pre statement.",
+//	  "none",
+//	  "a 'main' to implement the main function declaration 'static void main()'.",
+//	  "an identifier.",
+//	  "none",
+//	  "none",
+//	  "none"
+//  };
 
   /**
    * It uses "currentToken" and "expectedTokenSequences" to generate a parse
@@ -89,19 +143,16 @@ public class ParseException extends Exception {
                            int[][] expectedTokenSequences,
                            String[] tokenImage) {
     String eol = System.getProperty("line.separator", "\n");
-    StringBuffer expected = new StringBuffer();
+    String expected = "";
     int maxSize = 0;
     for (int i = 0; i < expectedTokenSequences.length; i++) {
       if (maxSize < expectedTokenSequences[i].length) {
         maxSize = expectedTokenSequences[i].length;
       }
       for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-        expected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');
+        expected += "\t" + tokenImage[expectedTokenSequences[i][j]];
       }
-      if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-        expected.append("...");
-      }
-      expected.append(eol).append("    ");
+      expected += eol;
     }
     String retval = "Encountered \"";
     Token tok = currentToken.next;
@@ -111,7 +162,7 @@ public class ParseException extends Exception {
         retval += tokenImage[0];
         break;
       }
-      retval += " " + tokenImage[tok.kind];
+      retval += " " + tokenImage[tok.kind].replaceAll("\"", "");
       retval += " \"";
       retval += add_escapes(tok.image);
       retval += " \"";
@@ -119,12 +170,13 @@ public class ParseException extends Exception {
     }
     retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
     retval += "." + eol;
-    if (expectedTokenSequences.length == 1) {
-      retval += "Was expecting:" + eol + "    ";
-    } else {
-      retval += "Was expecting one of:" + eol + "    ";
-    }
-    retval += expected.toString();
+//    if (expectedTokenSequences.length == 1) {
+//      retval += "Was expecting:" + eol + "    ";
+//    } else {
+//      retval += "Was expecting one of:" + eol + "    ";
+//    }
+    retval += "Maybe there would be" + eol + "    ";
+    retval += expected;
     return retval;
   }
 
@@ -184,4 +236,3 @@ public class ParseException extends Exception {
    }
 
 }
-/* JavaCC - OriginalChecksum=ba9f9fcbc6ca13a377b32ea9b2d74970 (do not edit this line) */
