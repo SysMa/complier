@@ -33,7 +33,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       }
     if (jj_ntk != 0){
     	throw new ParseException(token, 
-    			ParseException.ENDS_BEFORE_EOF);
+    			ParseException.ENDING_BEFORE_EOF);
     }
     tokenCountMap.put("$weight$", weight);
     {if (true) return jjtn000;}
@@ -230,6 +230,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break;
         case ASSIGN:
           assign();
+          try {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case INTEGER_LITERAL:
           case LONG_LITERAL:
@@ -251,6 +252,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             jj_la1[6] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
+          }
+          }
+          catch (ParseException pe){
+        	  if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+              	  pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+              	  pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+              	  pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+        		  throw new ParseException(token, ParseException.ERROR_AT_ASSIGNMENT);
+        	  }
+        	  throw pe;
           }
           jj_consume_token(SEMICOLON);
           break;
@@ -339,6 +350,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         break;
       case ASSIGN:
         assign();
+        try{
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case INTEGER_LITERAL:
         case LONG_LITERAL:
@@ -360,6 +372,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           jj_la1[10] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
+        }
+        }
+        catch (ParseException pe){
+      	  if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+      		  pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+      		  pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+      		  pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+      		  throw new ParseException(token, ParseException.ERROR_AT_ASSIGNMENT);
+      	  }
+      	  throw pe;
         }
         jj_consume_token(SEMICOLON);
         break;
@@ -670,6 +692,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             break;
           case ASSIGN:
             assign();
+            try{
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case INTEGER_LITERAL:
             case LONG_LITERAL:
@@ -692,6 +715,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
               jj_consume_token(-1);
               throw new ParseException();
             }
+            }
+            catch (ParseException pe){
+          	  if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+              	  pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+                  pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+                  pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+          		  throw new ParseException(token, ParseException.ERROR_AT_ASSIGNMENT);
+          	  }
+          	  throw pe;
+            }
             jj_consume_token(SEMICOLON);
             break;
           default:
@@ -705,7 +738,18 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case ASSIGN:
             assign();
-            exp();
+            try{
+            	exp();
+            }
+            catch (ParseException pe){
+          	  if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+              	  pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+              	  pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+              	  pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+          		  throw new ParseException(token, ParseException.ERROR_AT_ASSIGNMENT);
+          	  }
+          	  throw pe;
+            }
             jj_consume_token(SEMICOLON);
             break;
           case LSQPAREN:
@@ -713,7 +757,18 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             exp();
             jj_consume_token(RSQPAREN);
             assign();
-            exp();
+            try{
+            	exp();
+            }
+            catch (ParseException pe){
+          	  if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+          		  pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+                  pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+                  pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+          		  throw new ParseException(token, ParseException.ERROR_AT_ASSIGNMENT);
+          	  }
+          	  throw pe;
+            }
             jj_consume_token(SEMICOLON);
             break;
           default:
@@ -874,7 +929,18 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           jj_consume_token(-1);
           throw new ParseException();
         }
-        highLevelExp();
+        try{
+        	highLevelExp();
+        }
+        catch (ParseException pe){
+        	if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+        		pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+        		pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+        		pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+        		throw new ParseException(token, ParseException.ERROR_AFTER_OPERATOR);
+        	}
+        	throw pe;
+        }
       }
     } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -935,7 +1001,18 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           jj_consume_token(-1);
           throw new ParseException();
         }
-        unaryExp();
+        try{
+        	unaryExp();
+        }
+        catch (ParseException pe){
+        	if (pe.errorcode == ParseException.NONE_ERROR_CODE || 
+        		pe.errorcode == ParseException.MISSING_CLOSEPAR ||
+            	pe.errorcode == ParseException.MISSING_CLOSESQPAR ||
+            	pe.errorcode == ParseException.MISSING_CLOSEBRACE){
+        		throw new ParseException(token, ParseException.ERROR_AFTER_OPERATOR);
+        	}
+        	throw pe;
+        }
       }
     } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -1004,6 +1081,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break;
         case DOT:
           dot();
+          try{
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case LENGTH:
             length();
@@ -1018,6 +1096,12 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             jj_la1[32] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
+          }}
+          catch (ParseException pe){
+        	  if (pe.errorcode == ParseException.MISSING_CLOSEPAR){
+        		  throw pe;
+        	  }
+        	  throw new ParseException(token, ParseException.MISSING_AFTER_DOT);
           }
           break;
         default:
@@ -1481,7 +1565,11 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   jjtree.openNodeScope(jjtn000);
     try {
       jj_consume_token(RETURN);
-    } finally {
+    }
+    catch (ParseException e){
+    	throw new ParseException(token, ParseException.MISSING_RETURN);
+    }
+    finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
@@ -1835,6 +1923,29 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         jj_expentry = new int[1];
         jj_expentry[0] = i;
         jj_expentries.add(jj_expentry);
+        
+        switch (i){
+        case PRE:
+        	return new ParseException(token, ParseException.MISSING_PRE);
+        case POST:
+        	return new ParseException(token, ParseException.MISSING_POST);
+        case CLASS:
+        	return new ParseException(token, ParseException.MISSING_CLASS);
+        case STATIC:
+        	return new ParseException(token, ParseException.MISSING_STATIC);
+        case VOID:
+        	return new ParseException(token, ParseException.MISSING_VOID);
+        case MAIN:
+        	return new ParseException(token, ParseException.MISSING_MAIN);
+        case RBRACE:
+        	return new ParseException(token, ParseException.MISSING_CLOSEBRACE);
+        case RPAREN:
+        	return new ParseException(token, ParseException.MISSING_CLOSEPAR);
+        case RSQPAREN:
+        	return new ParseException(token, ParseException.MISSING_CLOSESQPAR);
+        case SEMICOLON:
+        	return new ParseException(token, ParseException.MISSING_SEMICOLON);
+        }
       }
     }
     jj_endpos = 0;

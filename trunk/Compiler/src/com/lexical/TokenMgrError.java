@@ -129,7 +129,7 @@ public class TokenMgrError extends Error
   }
   
   protected static String LexicalError(Token token){
-	  return ("Illegal identifiers at line " + 
+	  return ("Lexical error at line " + 
 			  token.beginLine + ", column " + 
 			  token.beginColumn + ". Encountered an illegal identifiers: " + 
 			  token.image + ".");
