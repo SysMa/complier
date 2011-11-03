@@ -1,0 +1,44 @@
+class Test{
+	static void main(){
+		//int test <= 10 //Maybe you want to end a statement but a semicolon';' is neccessary.
+		int size <= 100;
+		long[] x <= new long[size];
+		Fibonacci Fib <= new Fibonacci();
+		while((size-1) > 0)
+		{
+			x[size-1] <= Fib.ComputeSum(size);
+			size <= size - 1;	
+		}
+	}
+}
+
+class Fibonacci
+{
+	
+	int ComputeSum(int num)
+	{
+		pre: num > 0;
+		post: sum > 0;
+
+			int sum;
+			if(num > 2)
+			{
+				sum <= this.ComputeSum(num-1)+this.ComputeSum(num-2);
+			}
+			else if((num-2) > 1 && (num-2) < 3)
+			{
+				sum <= 2;	
+			}
+			else
+			{
+				sum <= 1;
+			}
+			return sum;
+	}
+	/*int Test(int)
+	{
+		return 0;
+	}
+	*/ //Syntax error, you need to add a par for function Test
+	
+}
