@@ -210,8 +210,10 @@ public class CompilerGUI {
 						SimpleNode parseTreeRoot = parser.program(weightMap);
 						parseTreeRoot.dump("", parseTree);
 						Integer weight = weightMap.get("$weight$");
+						Integer count = weightMap.get("$count$");
 						text_analysis.setText(parseTree.toString());
-						text_statistic.setText("该语法分析树的总权重:" + weight);
+						text_statistic.setText("该语法分析树的总权重:\t\t\t" + weight
+								+ "\n该语法分析树中简单语句的数目:\t" + count);
 						parseOk = true;
 					}
 					catch (Exception e2)

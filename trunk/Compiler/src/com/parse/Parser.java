@@ -14,10 +14,12 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   SimpleNode jjtn000 = new SimpleNode(JJTPROGRAM);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Integer weight = 0;
-  Integer subWeight = 0;
+  Integer count  = 0;
+  Integer[] subWeight;
     try {
       subWeight = mainClass();
-    weight += subWeight;
+    weight += subWeight[0];
+    count  += subWeight[1];
       label_1:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -29,13 +31,11 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break label_1;
         }
         subWeight = classDecl();
-      weight += subWeight;
+      weight += subWeight[0];
+      count  += subWeight[1];
       }
-    if (jj_ntk != 0){
-    	throw new ParseException(token, 
-    			ParseException.ENDING_BEFORE_EOF);
-    }
     tokenCountMap.put("$weight$", weight);
+    tokenCountMap.put("$count$", count);
     {if (true) return jjtn000;}
       jj_consume_token(0);
     } catch (Throwable jjte000) {
@@ -60,12 +60,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     throw new Error("Missing return statement in function");
   }
 
-  final public Integer mainClass() throws ParseException {
+  final public Integer[] mainClass() throws ParseException {
  /*@bgen(jjtree) MainClass */
   SimpleNode jjtn000 = new SimpleNode(JJTMAINCLASS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
     try {
       _class();
       id();
@@ -84,7 +85,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break label_2;
         }
         temp = varOrMethodDecl();
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
       }
       _static();
       _void();
@@ -109,13 +111,14 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break label_3;
         }
         temp = statement();
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
       }
       jj_consume_token(RBRACE);
       jj_consume_token(RBRACE);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return subWeight;}
+    {if (true) return new Integer[]{subWeight, count};}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -138,12 +141,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     throw new Error("Missing return statement in function");
   }
 
-  final public Integer classDecl() throws ParseException {
+  final public Integer[] classDecl() throws ParseException {
  /*@bgen(jjtree) ClassDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTCLASSDECL);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
     try {
       _class();
       id();
@@ -171,12 +175,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           break label_4;
         }
         temp = varOrMethodDecl();
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
       }
       jj_consume_token(RBRACE);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return subWeight;}
+    {if (true) return new Integer[]{subWeight, count};}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -199,12 +204,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     throw new Error("Missing return statement in function");
   }
 
-  final public Integer varOrMethodDecl() throws ParseException {
+  final public Integer[] varOrMethodDecl() throws ParseException {
  /*@bgen(jjtree) VarOrMethodDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTVARORMETHODDECL);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BOOLEAN:
@@ -264,6 +270,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         	  throw pe;
           }
           jj_consume_token(SEMICOLON);
+        {if (true) return new Integer[]{1, 1};}
           break;
         default:
           jj_la1[7] = jj_gen;
@@ -272,7 +279,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         }
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return 1;}
+      {if (true) return new Integer[]{0, 0};}
         break;
       case LPAREN:
         jj_consume_token(LPAREN);
@@ -298,16 +305,18 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             break label_5;
           }
           temp = statement();
-                  subWeight += temp;
+                  subWeight += temp[0];
+                  count += temp[1];
         }
         _return();
         exp();
                 subWeight += 1;
+                count += 1;
         jj_consume_token(SEMICOLON);
         jj_consume_token(RBRACE);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-          {if (true) return subWeight;}
+          {if (true) return new Integer[]{subWeight, count};}
         break;
       default:
         jj_la1[9] = jj_gen;
@@ -336,7 +345,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     throw new Error("Missing return statement in function");
   }
 
-  final public Integer mid_varDecl() throws ParseException {
+  final public Integer[] mid_varDecl() throws ParseException {
  /*@bgen(jjtree) VarDecl */
   SimpleNode jjtn000 = new SimpleNode(JJTVARDECL);
   boolean jjtc000 = true;
@@ -384,6 +393,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       	  throw pe;
         }
         jj_consume_token(SEMICOLON);
+        {if (true) return new Integer[]{1, 1};}
         break;
       default:
         jj_la1[11] = jj_gen;
@@ -392,7 +402,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       }
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return 1;}
+    {if (true) return new Integer[]{0, 0};}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -613,21 +623,22 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     }
   }
 
-  final public Integer statement() throws ParseException {
+  final public Integer[] statement() throws ParseException {
  /*@bgen(jjtree) Statement */
   SimpleNode jjtn000 = new SimpleNode(JJTSTATEMENT);
   boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);Integer temp;
+  jjtree.openNodeScope(jjtn000);Integer[] temp;
   Integer subWeight = 0;
+  Integer count = 0;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BOOLEAN:
       case INTEGER:
       case LONG:
-        subWeight = mid_varDecl();
+        temp = mid_varDecl();
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return subWeight;}
+    {if (true) return temp;}
         break;
       case LBRACE:
         jj_consume_token(LBRACE);
@@ -648,12 +659,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             break label_7;
           }
           temp = statement();
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
         }
         jj_consume_token(RBRACE);
               jjtree.closeNodeScope(jjtn000, true);
               jjtc000 = false;
-             {if (true) return subWeight;}
+             {if (true) return new Integer[]{subWeight, count};}
         break;
       case IF:
         _if();
@@ -661,14 +673,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         exp();
         jj_consume_token(RPAREN);
         temp = statement();
-    subWeight = temp;
+    subWeight = temp[0];
+    count += temp[1];
         _else();
         temp = statement();
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    subWeight += temp;
+    subWeight += temp[0];
+    count += temp[1];
     subWeight = subWeight * 2;
-    {if (true) return subWeight;}
+    {if (true) return new Integer[]{subWeight, count};}
         break;
       case WHILE:
         _while();
@@ -678,8 +692,9 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
         temp = statement();
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    subWeight = temp * 4;
-    {if (true) return subWeight;}
+    subWeight = temp[0] * 4;
+    count = temp[1];
+    {if (true) return new Integer[]{subWeight, count};}
         break;
       case ID:
         id();
@@ -726,12 +741,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
           	  throw pe;
             }
             jj_consume_token(SEMICOLON);
+                {if (true) return new Integer[]{1, 1};}
             break;
           default:
             jj_la1[20] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtc000 = false;
+        {if (true) return new Integer[]{0, 0};}
           break;
         case LSQPAREN:
         case ASSIGN:
@@ -776,15 +795,15 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
             jj_consume_token(-1);
             throw new ParseException();
           }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        {if (true) return new Integer[]{1, 1};}
           break;
         default:
           jj_la1[22] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-    jjtree.closeNodeScope(jjtn000, true);
-    jjtc000 = false;
-    {if (true) return 1;}
         break;
       default:
         jj_la1[23] = jj_gen;
@@ -1681,23 +1700,6 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_3_1() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_11()) {
-    jj_scanpos = xsp;
-    if (jj_3R_12()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    if (jj_scan_token(LONG)) return true;
-    if (jj_scan_token(LSQPAREN)) return true;
-    if (jj_scan_token(RSQPAREN)) return true;
-    return false;
-  }
-
   private boolean jj_3R_12() {
     if (jj_3R_14()) return true;
     return false;
@@ -1710,6 +1712,23 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
 
   private boolean jj_3R_13() {
     if (jj_scan_token(INTEGER)) return true;
+    if (jj_scan_token(LSQPAREN)) return true;
+    if (jj_scan_token(RSQPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_11()) {
+    jj_scanpos = xsp;
+    if (jj_3R_12()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    if (jj_scan_token(LONG)) return true;
     if (jj_scan_token(LSQPAREN)) return true;
     if (jj_scan_token(RSQPAREN)) return true;
     return false;

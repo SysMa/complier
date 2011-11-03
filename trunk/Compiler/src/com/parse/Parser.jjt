@@ -115,37 +115,43 @@ TOKEN: /* Identifiers */
 SimpleNode program(Map<String, Integer> tokenCountMap) #Program:
 {
   Integer weight = 0;
-  Integer subWeight = 0;
+  Integer count  = 0;
+  Integer[] subWeight;
 }
 {
   subWeight = mainClass()
   {
-    weight += subWeight;
+    weight += subWeight[0];
+    count  += subWeight[1];
   }
   (
     subWeight = classDecl()
     {
-      weight += subWeight;
+      weight += subWeight[0];
+      count  += subWeight[1];
     }
   )*
   {
     tokenCountMap.put("$weight$", weight);
+    tokenCountMap.put("$count$", count);
     return jjtThis;
   }
   < EOF >
 }
 
-Integer mainClass() #MainClass:
+Integer[] mainClass() #MainClass:
 {
   Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
 }
 {
   _class() id() < LBRACE >
   (
     temp = varOrMethodDecl()
     {
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
     }
   )*
   _static() _void() _main()
@@ -153,19 +159,21 @@ Integer mainClass() #MainClass:
   (
     temp = statement()
     {
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
     }
   )*
   < RBRACE > < RBRACE >
   {
-    return subWeight;
+    return new Integer[]{subWeight, count};
   }
 }
 
-Integer classDecl() #ClassDecl:
+Integer[] classDecl() #ClassDecl:
 {
   Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
 }
 {
   _class() id() (_extends() id())?
@@ -173,19 +181,21 @@ Integer classDecl() #ClassDecl:
   (
     temp = varOrMethodDecl()
     {
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
     }
   )*
   < RBRACE >
   {
-    return subWeight;
+    return new Integer[]{subWeight, count};
   }
 }
 
-Integer varOrMethodDecl() #VarOrMethodDecl:
+Integer[] varOrMethodDecl() #VarOrMethodDecl:
 {
   Integer subWeight = 0;
-  Integer temp;
+  Integer count = 0;
+  Integer[] temp;
 }
 {
   (type() | id()) id()
@@ -197,9 +207,11 @@ Integer varOrMethodDecl() #VarOrMethodDecl:
         exp()
       | < LSQPAREN > expList() < RSQPAREN >
       ) < SEMICOLON >
+      {
+      	return new Integer[]{1, 1};
+      }
     )
-    {
-      return 1;
+    {      return new Integer[]{0, 0};
     }
   | (
 	  < LPAREN > formalList() < RPAREN > < LBRACE >
@@ -207,22 +219,24 @@ Integer varOrMethodDecl() #VarOrMethodDecl:
 	  (
 	  	temp = statement()
 	  	{
-	  	  subWeight += temp;
+	  	  subWeight += temp[0];
+	  	  count += temp[1];
 	  	}
 	  )*
 	  _return() exp()
 	  {
 	  	subWeight += 1;
+	  	count += 1;
 	  }
 	  < SEMICOLON > < RBRACE >
 	)
 	{
-	  return subWeight;
+	  return new Integer[]{subWeight, count};
 	}
   )
 }
 
-Integer mid_varDecl() #VarDecl:
+Integer[] mid_varDecl() #VarDecl:
 {}
 {
   type() id()
@@ -233,9 +247,11 @@ Integer mid_varDecl() #VarDecl:
       exp()
     | < LSQPAREN > expList() < RSQPAREN >
     ) < SEMICOLON >
+    {
+    	return new Integer[]{1, 1};
+    }
   )
-  {
-    return 1;
+  {    return new Integer[]{0, 0};
   }
 }
 
@@ -280,43 +296,48 @@ void type() #Type:
   )
 }
 
-Integer statement() #Statement:
+Integer[] statement() #Statement:
 {
-  Integer temp;
+  Integer[] temp;
   Integer subWeight = 0;
+  Integer count = 0;
 }
 {
-  subWeight = mid_varDecl()
+  temp = mid_varDecl()
   {
-    return subWeight;
+    return temp;
   }
 | < LBRACE >
   (
     temp = statement()
     {
-      subWeight += temp;
+      subWeight += temp[0];
+      count += temp[1];
     }
   )*
-  < RBRACE >{return subWeight;}
+  < RBRACE >{return new Integer[]{subWeight, count};}
 | _if()
   < LPAREN > exp() < RPAREN > 
   temp = statement()
   {
-    subWeight = temp;
+    subWeight = temp[0];
+    count += temp[1];
   }
   _else()
   temp = statement()
   {
-    subWeight += temp;
+    subWeight += temp[0];
+    count += temp[1];
     subWeight = subWeight * 2;
-    return subWeight;
+    return new Integer[]{subWeight, count};
   }
 | _while()
   < LPAREN > exp() < RPAREN >
   temp = statement()
   {
-    subWeight = temp * 4;
-    return subWeight;
+    subWeight = temp[0] * 4;
+    count = temp[1];
+    return new Integer[]{subWeight, count};
   }
 | id()
   (
@@ -329,16 +350,21 @@ Integer statement() #Statement:
           exp()
         | < LSQPAREN > expList() < RSQPAREN >
         ) < SEMICOLON >
+        {
+    		return new Integer[]{1, 1};
+  		}
       )
+      {
+        return new Integer[]{0, 0};      }
     )
   | (
       (assign() exp() < SEMICOLON >)
     | (< LSQPAREN > exp() < RSQPAREN > assign() exp() < SEMICOLON >)
   	)
+  	{
+    	return new Integer[]{1, 1};
+  	}
   )
-  {
-    return 1;
-  }
 }
 
 void exp() #Exp:
