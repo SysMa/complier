@@ -199,7 +199,7 @@ public class CompilerGUI {
 					text_analysis.setText("请先进行词法分析！");
 					text_statistic.setText("");
 				}
-				else if(!parseOk){
+				else{
 					Parser parser = new Parser(tokenSource);
 					StringBuffer parseTree = 
 						new StringBuffer("这是生成的语法分析树:\n");
