@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -157,18 +158,20 @@ public class CompilerGUI {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String input = text_sourceCode.getText();
-				Map<String, Integer> tokenCountMap = new HashMap<String, Integer>();
+				HashMap<String, Integer> tokenCountMap = new HashMap<String, Integer>();
 				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
 				LexicalAnalyzer la = new LexicalAnalyzer(
 						new ByteArrayInputStream(input.getBytes()));
 				try{
 					tokenStr.append(la.getTokenString(tokenCountMap));
+					TreeMap<String, Integer> mapSorted = 
+						new TreeMap<String, Integer>(tokenCountMap);
 					text_analysis.setText(tokenStr.toString());
 					String statistic = "这是词法分析的统计结果:\n数目\t\t关键字或变量\n";
-					for (Iterator<String> i = tokenCountMap.keySet().iterator(); 
+					for (Iterator<String> i = mapSorted.keySet().iterator(); 
 			          	i.hasNext();){
 						String key = i.next();
-						statistic += tokenCountMap.get(key) + "\t\t" + key + "\n";
+						statistic += mapSorted.get(key) + "\t\t" + key + "\n";
 					}
 					text_statistic.setText(statistic);
 					tokenSource = la.getTokenSource();
