@@ -34,7 +34,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
       weight += subWeight[0];
       count  += subWeight[1];
       }
-    if (token.kind != EOF){
+    if (token.next.kind != EOF){
     	throw new ParseException(token, ParseException.ENDING_BEFORE_EOF);
     }
     tokenCountMap.put("$weight$", weight);
