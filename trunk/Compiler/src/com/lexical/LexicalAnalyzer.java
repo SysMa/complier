@@ -1,7 +1,7 @@
 package com.lexical;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 	public LexicalAnalyzerTokenManager token_source;
@@ -23,7 +23,7 @@ public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 	    token_source = new LexicalAnalyzerTokenManager(jj_input_stream);
 	}
 	
-	public String getTokenString(Map<String, Integer> tokenCountMap) throws Exception{
+	public String getTokenString(HashMap<String, Integer> tokenCountMap) throws Exception{
 		Token t;
 		String tokenStr = "";
 		try {
@@ -39,9 +39,30 @@ public class LexicalAnalyzer implements LexicalAnalyzerConstants {
 					tokenStr += "\t";
 					break;
 				case INTEGER_LITERAL:
+					{
+						Integer i = tokenCountMap.get("Integer literals: " + t.image);
+					    if (i == null)
+					    {
+					      i = 0;
+					    }
+					    i++;
+					    tokenCountMap.put("Integer literals: " + t.image, i);
+						tokenStr += "<" + tokenImage[t.kind] + ", " + t.image + ">";
+						tokenSource.add(t);
+					}
+					break;
 				case LONG_LITERAL:
-					tokenStr += "<" + tokenImage[t.kind] + ", " + t.image + ">";
-					tokenSource.add(t);
+					{
+						Integer i = tokenCountMap.get("Long literals: " + t.image);
+					    if (i == null)
+					    {
+					      i = 0;
+					    }
+					    i++;
+					    tokenCountMap.put("Long literals: " + t.image, i);
+						tokenStr += "<" + tokenImage[t.kind] + ", " + t.image + ">";
+						tokenSource.add(t);
+					}
 					break;
 				case BOOLEAN:
 				case CLASS:

@@ -348,19 +348,37 @@ void expList(Map<String, Integer> tokenCountMap, StringBuffer tokenStr):
   exp(tokenCountMap, tokenStr))*
 }
 
-void long_literal(StringBuffer tokenStr):
-{}
+void long_literal(Map<String, Integer> tokenCountMap, StringBuffer tokenStr):
 {
-  < LONG_LITERAL >
+  Token t;
+}
+{
+  t = < LONG_LITERAL >
   {
+    Integer i = tokenCountMap.get("Long literals: " + t.image);
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Long literals: " + t.image, i);
     tokenStr.append("long_literal ");
   }
 }
-void int_literal(StringBuffer tokenStr):
-{}
+void int_literal(Map<String, Integer> tokenCountMap, StringBuffer tokenStr):
 {
-  < INTEGER_LITERAL >
+  Token t;
+}
+{
+  t = < INTEGER_LITERAL >
   {
+    Integer i = tokenCountMap.get("Integer literals: " + t.image);
+    if (i == null)
+    {
+      i = 0;
+    }
+    i++;
+    tokenCountMap.put("Integer literals: " + t.image, i);
     tokenStr.append("int_literal ");
   }
 }
