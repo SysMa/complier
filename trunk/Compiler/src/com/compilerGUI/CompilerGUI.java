@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -41,6 +43,8 @@ public class CompilerGUI {
 
 	protected Shell shell;
 	protected Shell sematicshell;
+	private SashForm sashForm_1;
+	private Tree symbolTree;
 	private Text text_sourceCode;
 	private Text text_analysis;
 	private Text text_statistic;
@@ -163,6 +167,9 @@ public class CompilerGUI {
 		menuItem_optionFrame_lexicalAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				text_analysis.setVisible(true);
+				symbolTree.setVisible(false);
+				
 				String input = text_sourceCode.getText();
 				HashMap<String, Integer> tokenCountMap = new HashMap<String, Integer>();
 				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
@@ -196,6 +203,9 @@ public class CompilerGUI {
 		menuItem_optionFrame_syntaxAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				text_analysis.setVisible(true);
+				symbolTree.setVisible(false);
+				
 				if (textChanged){
 					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
 					text_statistic.setText("");
@@ -222,8 +232,8 @@ public class CompilerGUI {
 					}
 					catch (Exception e2)
 				    {
-				      text_analysis.setText(e2.getMessage());
-				      text_statistic.setText("");
+					    text_analysis.setText(e2.getMessage());
+					    text_statistic.setText("");
 				    }
 				}
 			}
@@ -234,6 +244,9 @@ public class CompilerGUI {
 		menuItem_optionFrame_semanticAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				text_analysis.setVisible(true);
+				symbolTree.setVisible(false);
+				
 				if (textChanged){
 					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
 					text_statistic.setText("");
@@ -247,19 +260,21 @@ public class CompilerGUI {
 					SemanticAnalyzer sa = new SemanticAnalyzer(root);
 					try{
 						sa.getSymbolTable();
-						String table = "Type\t\t\tVarible Name\n"
-									 + "------------------------------------------------\n"
-									 + sa.getSymbolTableString();
-						text_analysis.setText(table);
-						text_statistic.setText("aklsfjalsdjfalkj");
+						String dupMethod = "Duplicate methods: \n"
+										 + sa.getDupMethodString();
+
+						text_analysis.setVisible(false);
+						symbolTree.setVisible(true);
+						text_statistic.setText(dupMethod);
 						
-						//text_statistic.setVisible(false);
-						sa.run(sematicshell);
+						sa.createTable(symbolTree);
+						symbolTree.redraw();
+						symbolTree.pack();
 					}
 					catch (Exception e2)
-				    {
-				      text_analysis.setText(e2.getMessage());
-				      text_statistic.setText("");
+				    {	
+				        text_analysis.setText(e2.getMessage());
+				        text_statistic.setText("");
 				    }
 				}
 			}
@@ -304,14 +319,25 @@ public class CompilerGUI {
 		text_sourceCode.setText("Take an XYZ program as the input.");
 		textChanged = false;
 		
-		SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
+		sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
 		text_analysis = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		text_analysis.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a token stream. Show appropriate warning messages for illegal identifiers or tokens. \r\nNote: Any words such as \"5x\" and \"2y\", must be reported as an illegal identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a parse tree (or an abstract syntax tree) for this program. Show appropriate warning messages for syntax errors.\r\nNote: A program passing lexical analysis may fail during the syntactical analysis.  Then you need to display the results in the lexical analysis.");
 		
+		symbolTree = new Tree(sashForm_1, SWT.BORDER);
+		symbolTree.setVisible(false);
+		symbolTree.setHeaderVisible(true);
+		symbolTree.setLinesVisible(false);
+		TreeColumn tc = new TreeColumn(symbolTree, SWT.LEFT);
+		tc.setText("Scope");
+		tc = new TreeColumn(symbolTree, SWT.LEFT);
+		tc.setText("Type");
+		tc = new TreeColumn(symbolTree, SWT.LEFT);
+		tc.setText("Varible Name");
+		
 		text_statistic = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		text_statistic.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AShow the occurrence times of each keyword or identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1ACalculate the weight of a parse tree.");
-		sashForm_1.setWeights(new int[] {1, 1});
+		sashForm_1.setWeights(new int[] {1, 1, 1});
 		sashForm.setWeights(new int[] {1, 1});
 
 	}
