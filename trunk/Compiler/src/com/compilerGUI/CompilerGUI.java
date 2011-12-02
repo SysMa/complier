@@ -269,7 +269,7 @@ public class CompilerGUI {
 						
 						sa.createTable(symbolTree);
 						symbolTree.redraw();
-						symbolTree.pack();
+						symbolTree.setSize(symbolTree.getParent().getSize().x, symbolTree.getParent().getSize().y / 2);
 					}
 					catch (Exception e2)
 				    {	

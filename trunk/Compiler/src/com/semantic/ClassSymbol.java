@@ -105,11 +105,11 @@ public class ClassSymbol extends Symbol {
 			ArrayList<MethodSymbol> msList = dupms.get(key);
 			for (int i = 0; i < msList.size(); i++){
 				MethodSymbol ms = msList.get(i);
-				str += ms.getType() + " " + ms.getName() + "(";
+				str += "\t\t" + ms.getType() + " " + ms.getName() + "(";
 				ArrayList<Symbol> params = ms.getParamsSymbolTable();
 				for (int j = 0; j < params.size(); j++){
 					Symbol s = params.get(j);
-					str += "\t\t" + s.getType() + " " + s.getName();
+					str += s.getType() + " " + s.getName();
 					if (j != (params.size() - 1)){
 						str += ", ";
 					}
