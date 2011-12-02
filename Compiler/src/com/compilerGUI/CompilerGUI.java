@@ -40,6 +40,7 @@ import org.eclipse.swt.events.ModifyEvent;
 public class CompilerGUI {
 
 	protected Shell shell;
+	protected Shell sematicshell;
 	private Text text_sourceCode;
 	private Text text_analysis;
 	private Text text_statistic;
@@ -72,6 +73,9 @@ public class CompilerGUI {
 		createContents();
 		shell.open();
 		shell.layout();
+		
+		sematicshell = new Shell(display);
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -247,7 +251,10 @@ public class CompilerGUI {
 									 + "------------------------------------------------\n"
 									 + sa.getSymbolTableString();
 						text_analysis.setText(table);
-						text_statistic.setText("");
+						text_statistic.setText("aklsfjalsdjfalkj");
+						
+						//text_statistic.setVisible(false);
+						sa.run(sematicshell);
 					}
 					catch (Exception e2)
 				    {

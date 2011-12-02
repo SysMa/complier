@@ -2,6 +2,9 @@ package com.semantic;
 
 import java.util.ArrayList;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import com.lexical.Token;
 import com.parse.SimpleNode;
 import com.parse.ParserTreeConstants;
@@ -205,5 +208,9 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 	
 	public String getSymbolTableString(){
 		return symbolTable.toString();
+	}
+	
+	public void run(Shell shell) {
+		symbolTable.run(shell);
 	}
 }

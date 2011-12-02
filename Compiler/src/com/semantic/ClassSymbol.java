@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+//for table tree
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.*;
+import org.eclipse.swt.layout.*;
+import org.eclipse.swt.widgets.*;
+
 public class ClassSymbol extends Symbol {
 	
 	private HashMap<String, String> fieldSymbolTable;
@@ -83,5 +89,36 @@ public class ClassSymbol extends Symbol {
 		String str = "\t" + getType() + "\t\t\t" + getName() + "\n"
 				   + fieldToString() + methodToString();
 		return str;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void fillNode(TableTreeItem classnode){
+		classnode.setText(0, "Class");
+		classnode.setText(1, getType());
+		classnode.setText(2, getName());
+		
+		fillFiled(classnode);
+		fillMethod(classnode);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void fillFiled(TableTreeItem classnode){
+		Set<String> keys = fieldSymbolTable.keySet();
+		for (Iterator<String> i = keys.iterator(); i.hasNext();){
+			String key = i.next();
+			TableTreeItem filednode = new TableTreeItem(classnode, SWT.NONE);
+			filednode.setText(0, "Filed");
+			filednode.setText(1, fieldSymbolTable.get(key));
+			filednode.setText(2, key);
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void fillMethod(TableTreeItem classnode){
+		for (int i = 0; i < methodSymbolTable.size(); i++){
+			MethodSymbol ms = methodSymbolTable.get(i);
+			TableTreeItem methodnode = new TableTreeItem(classnode, SWT.NONE);
+			ms.fillmethodNode(methodnode);
+		}
 	}
 }
