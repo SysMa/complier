@@ -4,6 +4,7 @@ import com.lexical.LexicalAnalyzer;
 import com.lexical.Token;
 import com.parse.Parser;
 import com.parse.SimpleNode;
+import com.semantic.SemanticAnalyzer;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -48,6 +49,7 @@ public class CompilerGUI {
 	private boolean parseOk = false;
 	
 	private ArrayList<Token> tokenSource = new ArrayList<Token>();
+	private SimpleNode root;
 
 	/**
 	 * Launch the application.
@@ -190,9 +192,6 @@ public class CompilerGUI {
 		menuItem_optionFrame_syntaxAnalysis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-//				String input = text_sourceCode.getText();
-//				Parser parser = new Parser(
-//						new ByteArrayInputStream(input.getBytes()));
 				if (textChanged){
 					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
 					text_statistic.setText("");
@@ -208,8 +207,8 @@ public class CompilerGUI {
 						new StringBuffer("这是生成的语法分析树:\n");
 					Map<String, Integer> weightMap = new HashMap<String, Integer>();
 					try{
-						SimpleNode parseTreeRoot = parser.program(weightMap);
-						parseTreeRoot.dump("", parseTree);
+						root = parser.program(weightMap);
+						root.dump("", parseTree);
 						Integer weight = weightMap.get("$weight$");
 						Integer count = weightMap.get("$count$");
 						text_analysis.setText(parseTree.toString());
@@ -228,6 +227,36 @@ public class CompilerGUI {
 		menuItem_optionFrame_syntaxAnalysis.setText("\u8BED\u6CD5\u5206\u6790");
 		
 		MenuItem menuItem_optionFrame_semanticAnalysis = new MenuItem(menuItem_optionFrame, SWT.NONE);
+		menuItem_optionFrame_semanticAnalysis.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (textChanged){
+					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
+					text_statistic.setText("");
+					textChanged = false;
+				}
+				else if (!parseOk){
+					text_analysis.setText("请先进行语法分析！");
+					text_statistic.setText("");
+				}
+				else{
+					SemanticAnalyzer sa = new SemanticAnalyzer(root);
+					try{
+						sa.getSymbolTable();
+						String table = "Type\t\t\tVarible Name\n"
+									 + "------------------------------------------------\n"
+									 + sa.getSymbolTableString();
+						text_analysis.setText(table);
+						text_statistic.setText("");
+					}
+					catch (Exception e2)
+				    {
+				      text_analysis.setText(e2.getMessage());
+				      text_statistic.setText("");
+				    }
+				}
+			}
+		});
 		menuItem_optionFrame_semanticAnalysis.setText("\u8BED\u4E49\u5206\u6790");
 		
 		MenuItem menuItem_optionFrame_codeGeneration = new MenuItem(menuItem_optionFrame, SWT.NONE);
