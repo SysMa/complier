@@ -2,6 +2,13 @@ package com.semantic;
 
 import java.util.ArrayList;
 
+import org.eclipse.swt.SWT;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.*;
+import org.eclipse.swt.layout.*;
+import org.eclipse.swt.widgets.*;
+
 public class MethodSymbol extends Symbol {
 	private ArrayList<Symbol> paramsSymbolTable;
 	private ArrayList<Symbol> localsSymbolTable;
@@ -113,4 +120,35 @@ public class MethodSymbol extends Symbol {
 		return str;
 	}
 	
+	@SuppressWarnings("deprecation")
+	public void fillmethodNode(TableTreeItem methodnode) {
+		methodnode.setText(0, "Method");
+		methodnode.setText(1, getType());
+		methodnode.setText(2, getName());
+
+		fillparams(methodnode);
+		filllocals(methodnode);
+	}
+
+	@SuppressWarnings("deprecation")
+	public void fillparams(TableTreeItem methodnode) {
+		for (int i = 0; i < paramsSymbolTable.size(); i++){
+			Symbol s = paramsSymbolTable.get(i);
+			TableTreeItem para = new TableTreeItem(methodnode, SWT.NONE);
+			para.setText(0, "Para");
+			para.setText(1, s.getType());
+			para.setText(2, s.getName());
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public void filllocals(TableTreeItem methodnode) {
+		for (int i = 0; i < localsSymbolTable.size(); i++){
+			Symbol s = localsSymbolTable.get(i);
+			TableTreeItem local = new TableTreeItem(methodnode, SWT.NONE);
+			local.setText(0, "Local");
+			local.setText(1, s.getType());
+			local.setText(2, s.getName());
+		}
+	}
 }
