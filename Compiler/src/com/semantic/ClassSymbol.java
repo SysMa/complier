@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-//for table tree
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
 public class ClassSymbol extends Symbol {
@@ -36,14 +33,6 @@ public class ClassSymbol extends Symbol {
 	// add a new field symbol
 	public void putFieldSymbol(String name, String type){
 		fieldSymbolTable.put(name, type);
-	}
-
-	public ArrayList<MethodSymbol> getMethodSymbolTable() {
-		return methodSymbolTable;
-	}
-
-	public void setMethodSymbolTable(ArrayList<MethodSymbol> methodSymbolTable) {
-		this.methodSymbolTable = methodSymbolTable;
 	}
 	
 	public ArrayList<MethodSymbol> getMethodSymbol(String name){
@@ -91,8 +80,49 @@ public class ClassSymbol extends Symbol {
 		return str;
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void fillNode(TableTreeItem classnode){
+	private HashMap<String, ArrayList<MethodSymbol>> getDupMethod(){
+		HashMap<String, ArrayList<MethodSymbol>> dupms = new 
+					HashMap<String, ArrayList<MethodSymbol>>();
+		
+		for (int i = 0; i < methodSymbolTable.size(); i++){
+			MethodSymbol ms = methodSymbolTable.get(i);
+			ArrayList<MethodSymbol> msList = getMethodSymbol(ms.getName());
+			if (msList.size() > 1 && !dupms.containsKey(ms.getName())){
+				dupms.put(ms.getName(), msList);
+			}
+		}
+		return dupms;
+	}
+	
+	public String getDupMethodString(){
+		String str = "";
+		
+		HashMap<String, ArrayList<MethodSymbol>> dupms = getDupMethod();
+		Set<String> keys = dupms.keySet();
+		
+		for (Iterator<String> iter = keys.iterator(); iter.hasNext();){
+			String key = iter.next();
+			ArrayList<MethodSymbol> msList = dupms.get(key);
+			for (int i = 0; i < msList.size(); i++){
+				MethodSymbol ms = msList.get(i);
+				str += ms.getType() + " " + ms.getName() + "(";
+				ArrayList<Symbol> params = ms.getParamsSymbolTable();
+				for (int j = 0; j < params.size(); j++){
+					Symbol s = params.get(j);
+					str += "\t\t" + s.getType() + " " + s.getName();
+					if (j != (params.size() - 1)){
+						str += ", ";
+					}
+				}
+				str += ")\n";
+			}
+			str += "\n";
+		}
+		
+		return str;
+	}
+	
+	public void fillNode(TreeItem classnode){
 		classnode.setText(0, "Class");
 		classnode.setText(1, getType());
 		classnode.setText(2, getName());
@@ -101,23 +131,22 @@ public class ClassSymbol extends Symbol {
 		fillMethod(classnode);
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void fillFiled(TableTreeItem classnode){
+
+	public void fillFiled(TreeItem classnode){
 		Set<String> keys = fieldSymbolTable.keySet();
 		for (Iterator<String> i = keys.iterator(); i.hasNext();){
 			String key = i.next();
-			TableTreeItem filednode = new TableTreeItem(classnode, SWT.NONE);
+			TreeItem filednode = new TreeItem(classnode, SWT.NONE);
 			filednode.setText(0, "Filed");
 			filednode.setText(1, fieldSymbolTable.get(key));
 			filednode.setText(2, key);
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void fillMethod(TableTreeItem classnode){
+	public void fillMethod(TreeItem classnode){
 		for (int i = 0; i < methodSymbolTable.size(); i++){
 			MethodSymbol ms = methodSymbolTable.get(i);
-			TableTreeItem methodnode = new TableTreeItem(classnode, SWT.NONE);
+			TreeItem methodnode = new TreeItem(classnode, SWT.NONE);
 			ms.fillmethodNode(methodnode);
 		}
 	}
