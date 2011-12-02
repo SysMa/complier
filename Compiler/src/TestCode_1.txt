@@ -1,0 +1,46 @@
+class test {
+	static void main() {
+		operateI operI <= new operateI();
+		operateII operII <= new operateII();
+		/*Type mismatch: cannot convert from a Foo to a Bar.
+		operateII operII;
+		operII <= operI;	//line:7 */
+
+		int [] x <= [2, 3];
+		/*Array constants can only be used in initializers.
+		int [] x <= new int[2];
+		x <= [2, 3];	//line:12 */
+
+		int a;
+		int b;
+		a <= operI.absoluteValue(x[0]);
+		b <= operII.multiply(x[0], x[1]);
+		/*Test SyntaxError For: Syntax error on token ".", invalid VariableDeclarator.
+		b <= operII.;	line:19 */
+	}
+}
+class operateI {
+	int absoluteValue(int x) {
+		pre: x < 0;
+		post: y > 0;
+		int y;
+		y <= 0-x;
+		return y;
+	}
+}
+class operateII {
+	int value <= 10;
+	int multiply(int [] x) {
+		pre: x.length > 1;
+		post: x.length > 1;
+		int mult;
+		if(x[0] < 0) {
+			int temp <= x[0] + value;
+			//int temp <= x(0) + value;	//line:39
+			mult <= temp*x[1];
+		}
+		else
+			mult <= x[0]*x[1];
+		return mult;
+	}
+}
