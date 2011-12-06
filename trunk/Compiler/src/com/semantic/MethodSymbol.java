@@ -6,6 +6,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.*;
 
 public class MethodSymbol extends Symbol {
+	static private int methodCount = 0;
+	
+	private int id = 0;
 	private ArrayList<Symbol> paramsSymbolTable;
 	private ArrayList<Symbol> localsSymbolTable;
 	
@@ -17,6 +20,18 @@ public class MethodSymbol extends Symbol {
 		super(name, type);
 		paramsSymbolTable = new ArrayList<Symbol>();
 		localsSymbolTable = new ArrayList<Symbol>();
+	}
+	
+	static public void addMethodCount(){
+		methodCount++;
+	}
+	
+	public void setId(){
+		id = MethodSymbol.methodCount;
+	}
+	
+	public int getId(){
+		return id;
 	}
 	
 	public ArrayList<Symbol> getParamsSymbolTable() {

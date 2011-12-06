@@ -170,6 +170,7 @@ public class CompilerGUI {
 			public void widgetSelected(SelectionEvent e) {
 				text_analysis.setVisible(true);
 				symbolTree.setVisible(false);
+				sashForm_1.layout();
 				
 				String input = text_sourceCode.getText();
 				HashMap<String, Integer> tokenCountMap = new HashMap<String, Integer>();
@@ -206,6 +207,7 @@ public class CompilerGUI {
 			public void widgetSelected(SelectionEvent e) {
 				text_analysis.setVisible(true);
 				symbolTree.setVisible(false);
+				sashForm_1.layout();
 				
 				if (textChanged){
 					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");
@@ -248,6 +250,7 @@ public class CompilerGUI {
 			public void widgetSelected(SelectionEvent e) {
 				text_analysis.setVisible(true);
 				symbolTree.setVisible(false);
+				sashForm_1.layout();
 				
 				if (textChanged){
 					text_analysis.setText("源文件已发生更改，请重新进行词法分析！");

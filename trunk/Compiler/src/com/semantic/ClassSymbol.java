@@ -10,19 +10,28 @@ import org.eclipse.swt.widgets.*;
 
 public class ClassSymbol extends Symbol {
 	
+	private ClassSymbol parent;
 	private HashMap<String, String> fieldSymbolTable;
 	private ArrayList<MethodSymbol> methodSymbolTable;
 	
 	public ClassSymbol(){
 		fieldSymbolTable = new HashMap<String, String>();
 		methodSymbolTable = new ArrayList<MethodSymbol>();
+		parent = null;
 	}
 	public ClassSymbol(String name){
 		super(name, "class");
 		fieldSymbolTable = new HashMap<String, String>();
 		methodSymbolTable = new ArrayList<MethodSymbol>();
+		parent = null;
 	}
 	
+	public ClassSymbol getParent() {
+		return parent;
+	}
+	public void setParent(ClassSymbol parent) {
+		this.parent = parent;
+	}
 	// get field symbol's type via name if the symbol doen't exist, return null
 	public String getFieldSymbolType(String name){
 		if (fieldSymbolTable.containsKey(name)){
@@ -35,7 +44,7 @@ public class ClassSymbol extends Symbol {
 		fieldSymbolTable.put(name, type);
 	}
 	
-	public ArrayList<MethodSymbol> getMethodSymbol(String name){
+	public ArrayList<MethodSymbol> getMethodSymbolList(String name){
 		ArrayList<MethodSymbol> msList = new ArrayList<MethodSymbol>();
 		for (int i = 0; i < methodSymbolTable.size(); i++){
 			MethodSymbol ms = methodSymbolTable.get(i);
@@ -44,6 +53,16 @@ public class ClassSymbol extends Symbol {
 			}
 		}
 		return msList;
+	}
+	
+	public MethodSymbol getMethodSymbol(String name, int id){
+		for (int i = 0; i < methodSymbolTable.size(); i++){
+			MethodSymbol ms = methodSymbolTable.get(i);
+			if (ms.getName().endsWith(name) && ms.getId() == id){
+				return ms;
+			}
+		}
+		return null;
 	}
 	
 	// add a new method symbol
@@ -86,7 +105,7 @@ public class ClassSymbol extends Symbol {
 		
 		for (int i = 0; i < methodSymbolTable.size(); i++){
 			MethodSymbol ms = methodSymbolTable.get(i);
-			ArrayList<MethodSymbol> msList = getMethodSymbol(ms.getName());
+			ArrayList<MethodSymbol> msList = getMethodSymbolList(ms.getName());
 			if (msList.size() > 1 && !dupms.containsKey(ms.getName())){
 				dupms.put(ms.getName(), msList);
 			}
