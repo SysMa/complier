@@ -201,8 +201,8 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
-	public void checkType(){
-		
+	public void checkType() throws SemanticException{
+		throw new SemanticException("test");
 	}
 	
 	public String getSymbolTableString(){

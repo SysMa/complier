@@ -5,6 +5,7 @@ import com.lexical.Token;
 import com.parse.Parser;
 import com.parse.SimpleNode;
 import com.semantic.SemanticAnalyzer;
+import com.semantic.SemanticException;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -229,6 +230,7 @@ public class CompilerGUI {
 						text_statistic.setText("该语法分析树的总权重:\t\t\t" + weight
 								+ "\n该语法分析树中简单语句的数目:\t" + count);
 						parseOk = true;
+						textChanged = false;
 					}
 					catch (Exception e2)
 				    {
@@ -269,7 +271,14 @@ public class CompilerGUI {
 						
 						sa.createTable(symbolTree);
 						symbolTree.redraw();
-						symbolTree.setSize(symbolTree.getParent().getSize().x, symbolTree.getParent().getSize().y / 2);
+						sashForm_1.layout();
+						
+						sa.checkType();
+					}
+					catch (SemanticException se){
+						text_analysis.setVisible(true);
+						sashForm_1.layout();
+						text_analysis.setText(se.getMessage());
 					}
 					catch (Exception e2)
 				    {	
@@ -322,10 +331,6 @@ public class CompilerGUI {
 		
 		sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
-		text_analysis = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
-		text_analysis.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		text_analysis.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a token stream. Show appropriate warning messages for illegal identifiers or tokens. \r\nNote: Any words such as \"5x\" and \"2y\", must be reported as an illegal identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a parse tree (or an abstract syntax tree) for this program. Show appropriate warning messages for syntax errors.\r\nNote: A program passing lexical analysis may fail during the syntactical analysis.  Then you need to display the results in the lexical analysis.");
-		
 		symbolTree = new Tree(sashForm_1, SWT.BORDER);
 		symbolTree.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		symbolTree.setVisible(false);
@@ -337,6 +342,10 @@ public class CompilerGUI {
 		tc.setText("Type");
 		tc = new TreeColumn(symbolTree, SWT.LEFT);
 		tc.setText("Varible Name");
+		
+		text_analysis = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
+		text_analysis.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		text_analysis.setText("\u8BCD\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a token stream. Show appropriate warning messages for illegal identifiers or tokens. \r\nNote: Any words such as \"5x\" and \"2y\", must be reported as an illegal identifier.\r\n\r\n\u8BED\u6CD5\u5206\u6790\u9636\u6BB5\uFF1AGenerate and display a parse tree (or an abstract syntax tree) for this program. Show appropriate warning messages for syntax errors.\r\nNote: A program passing lexical analysis may fail during the syntactical analysis.  Then you need to display the results in the lexical analysis.");
 		
 		text_statistic = new Text(sashForm_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		text_statistic.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
