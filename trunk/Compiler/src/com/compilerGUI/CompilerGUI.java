@@ -284,7 +284,9 @@ public class CompilerGUI {
 						text_analysis.setText(se.getMessage());
 					}
 					catch (Exception e2)
-				    {	
+				    {
+						text_analysis.setVisible(true);
+						sashForm_1.layout();
 				        text_analysis.setText(e2.getMessage());
 				        text_statistic.setText("");
 				    }
