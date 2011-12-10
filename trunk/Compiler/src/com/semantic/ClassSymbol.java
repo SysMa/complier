@@ -65,6 +65,50 @@ public class ClassSymbol extends Symbol {
 		return null;
 	}
 	
+	public MethodSymbol ifMethodExist(String name, ArrayList<String> params){
+		ArrayList<MethodSymbol> msList = getMethodSymbolList(name);
+		ArrayList<MethodSymbol> mss = new ArrayList<MethodSymbol>();
+		int minIndex = 0;
+		int min = 1000;
+		
+		for (int i = 0; i < msList.size(); i++){
+			int flag = 0;
+			MethodSymbol ms = msList.get(i);
+			ArrayList<Symbol> paramList = ms.getParamsSymbolTable();
+			if (params.size() == paramList.size()){
+				int j;
+				for (j = 0; j < params.size(); j++){
+					String type = params.get(j);
+					String expType = paramList.get(j).getType();
+					if (!type.equals(expType)){
+						if (("int".equals(type) && "long".equals(expType))
+							|| ("int[]".equals(type) && "long[]".equals(expType))){
+							flag++;
+							continue;
+						}
+						break;
+					}
+				}
+				if (j == params.size()){
+					if (flag > 1){
+						if (flag < min){
+							min = flag;
+							minIndex = mss.size();
+						}
+						mss.add(ms);
+					}
+					else {
+						return ms;
+					}
+				}
+			}
+		}
+		if (mss.size() == 0){
+			return null;
+		}
+		return mss.get(minIndex);
+	}
+	
 	// add a new method symbol
 	public void putMethodSymbol(MethodSymbol ms){
 		methodSymbolTable.add(ms);
@@ -146,17 +190,17 @@ public class ClassSymbol extends Symbol {
 		classnode.setText(1, getType());
 		classnode.setText(2, getName());
 		
-		fillFiled(classnode);
+		fillField(classnode);
 		fillMethod(classnode);
 	}
 	
 
-	public void fillFiled(TreeItem classnode){
+	public void fillField(TreeItem classnode){
 		Set<String> keys = fieldSymbolTable.keySet();
 		for (Iterator<String> i = keys.iterator(); i.hasNext();){
 			String key = i.next();
 			TreeItem filednode = new TreeItem(classnode, SWT.NONE);
-			filednode.setText(0, "Filed");
+			filednode.setText(0, "Field");
 			filednode.setText(1, fieldSymbolTable.get(key));
 			filednode.setText(2, key);
 		}
