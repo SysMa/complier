@@ -838,6 +838,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   final public void exp() throws ParseException {
  /*@bgen(jjtree) Exp */
   SimpleNode jjtn000 = new SimpleNode(JJTEXP);
+  jjtn000.jjtSetValue(token);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -916,6 +917,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   final public void lowLevelExp() throws ParseException {
  /*@bgen(jjtree) LowLevelExp */
   SimpleNode jjtn000 = new SimpleNode(JJTLOWLEVELEXP);
+  jjtn000.jjtSetValue(token);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -988,6 +990,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   final public void highLevelExp() throws ParseException {
  /*@bgen(jjtree) HighLevelExp */
   SimpleNode jjtn000 = new SimpleNode(JJTHIGHLEVELEXP);
+  jjtn000.jjtSetValue(token);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -1321,7 +1324,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(NOT);
+      Token t = jj_consume_token(NOT);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1335,7 +1339,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(AND);
+      Token t = jj_consume_token(AND);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1349,7 +1354,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(OR);
+      Token t = jj_consume_token(OR);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1363,7 +1369,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(PLUS);
+      Token t = jj_consume_token(PLUS);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1377,7 +1384,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(MINUS);
+      Token t = jj_consume_token(MINUS);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1391,7 +1399,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(MUL);
+      Token t = jj_consume_token(MUL);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1405,7 +1414,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(DIVISION);
+      Token t = jj_consume_token(DIVISION);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1419,7 +1429,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(LESSTHAN);
+      Token t = jj_consume_token(LESSTHAN);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1433,7 +1444,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      jj_consume_token(LARGERTHAN);
+      Token t = jj_consume_token(LARGERTHAN);
+      jjtn000.jjtSetValue(t);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1522,6 +1534,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, LexicalAnaly
   jjtree.openNodeScope(jjtn000);
     try {
       jj_consume_token(BOOLEAN);
+      jjtn000.jjtSetValue("boolean");
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);

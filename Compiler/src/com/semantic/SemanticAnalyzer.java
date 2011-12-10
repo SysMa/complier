@@ -12,9 +12,14 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 	private SimpleNode simpleNode;
 	private SymbolTable symbolTable;
 	
-	private enum EXP_ENTRY{PRE, POST, STATEMENT};
+	private int FLAG_CLASS	= 0x0001;
+	private int FLAG_PRE	= 0x0003;
+	private int FLAG_METHOD = 0x0007;
+	private int FLAG_POST	= 0x000F;
 	
 	private int curMethodCount = 0;
+	
+	private Symbol lastSymbol = null;
 
 	public SemanticAnalyzer(SimpleNode simpleNode){
 		this.simpleNode = simpleNode;
@@ -35,7 +40,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 				if (symbolTable.getClassSymbol(name) != null){
 					String str = "Error occurs at line " + t.beginLine + ", column " 
 							   + t.beginColumn + ", Class " + name 
-							   + " has already defined before.";
+							   + " has already been defined before.";
 					throw new Exception(str);
 				}
 				ClassSymbol cs = new ClassSymbol(name);
@@ -56,9 +61,20 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 			case JJTVARORMETHODDECL:
 				getSymbolTable(children, cs);
 				break;
+			case JJTID:
 			case JJTTYPE:
-				String type = ((SimpleNode)children.jjtGetChild(0))
+				if (i != 0){
+					break;
+				}
+				String type = "";
+				if (children.getId() == JJTID){
+					type = children.jjtGetValue().toString();
+				}
+				else{
+					type = ((SimpleNode)children.jjtGetChild(i))
 								.jjtGetValue().toString();
+
+				}
 				SimpleNode temp = (SimpleNode)node.jjtGetChild(i + 1);
 				Token t = (Token)temp.jjtGetValue();
 				String name = t.toString();
@@ -66,7 +82,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 				if (name.equals(cs.getName())){
 					String str = "Error occurs at line " + t.beginLine + ", column " 
 					   + t.beginColumn + ", Varible " + name 
-					   + " has already defined as a Class before.";
+					   + " has already been defined as a Class before.";
 					throw new Exception(str);
 				}
 				
@@ -81,7 +97,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 							if (tMs.paramsEquals(ms)){
 								String str = "Error occurs at line " + t.beginLine + ", column " 
 								   + t.beginColumn + ", Method " + ms.getName() 
-								   + " has already defined with the same parameters type"
+								   + " has already been defined with the same parameters type"
 								   + " in the Class " + cs.getName() + ".";
 								throw new Exception(str);
 							}
@@ -95,7 +111,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 						if (cs.getFieldSymbolType(name) != null){
 							String str = "Error occurs at line " + t.beginLine + ", column " 
 							   + t.beginColumn + ", Varible " + name 
-							   + " has already defined in the Class " 
+							   + " has already been defined in the Class " 
 							   + cs.getName() + ".";
 							throw new Exception(str);
 						}
@@ -107,7 +123,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					if (cs.getFieldSymbolType(name) != null){
 						String str = "Error occurs at line " + t.beginLine + ", column " 
 						   + t.beginColumn + ", Varible " + name 
-						   + " has already defined in the Class " 
+						   + " has already been defined in the Class " 
 						   + cs.getName() + ".";
 						throw new Exception(str);
 					}
@@ -167,7 +183,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					if (ms.getParamsSymbolType(name) != null){
 						String str = "Error occurs at line " + t.beginLine + ", column " 
 						   + t.beginColumn + ", Parameter " + name 
-						   + " has already defined in the Method " + ms.getName();
+						   + " has already been defined in the Method " + ms.getName();
 						throw new Exception(str);
 					}
 					ms.putParamsSymbol(new Symbol(name, type));
@@ -178,14 +194,14 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					if (ms.getParamsSymbolType(name) != null){
 						String str = "Error occurs at line " + t.beginLine + ", column " 
 						   + t.beginColumn + ", Varible " + name 
-						   + " has already defined as a parameter in the Method "
+						   + " has already been defined as a parameter in the Method "
 						   + ms.getName();
 						throw new Exception(str);
 					}
 					if (ms.getLocalsSymbolType(name) != null){
 						String str = "Error occurs at line " + t.beginLine + ", column " 
 						   + t.beginColumn + ", Varible " + name 
-						   + " has already defined in Method " + ms.getName();
+						   + " has already been defined in Method " + ms.getName();
 						throw new Exception(str);
 					}
 					ms.putLocalsSymbol(new Symbol(name, type));
@@ -223,7 +239,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 						if (parent == null){
 							String str = "Error occurs at line " + t.beginLine 
 							   + ", column " + t.beginColumn + ", Class " + name 
-							   + " doesn't exist. ";
+							   + " is not defined. ";
 							throw new SemanticException(str);
 						}
 						else{
@@ -247,7 +263,11 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 			case JJTVARORMETHODDECL:
 				checkType(children, cs);
 				break;
+			case JJTID:
 			case JJTTYPE:
+				if (i != 0){
+					break;
+				}
 				SimpleNode temp = (SimpleNode)node.jjtGetChild(i + 1);
 				Token t = (Token)temp.jjtGetValue();
 				String name = t.toString();
@@ -259,6 +279,35 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 						MethodSymbol ms = cs.getMethodSymbol(name, curMethodCount);
 						checkType(node, cs, ms);
 						i = i + 2;
+					}
+					else {
+						String expType = cs.getFieldSymbolType(name);
+						temp2 = (SimpleNode)node.jjtGetChild(i + 3);
+						if (temp2.getId() == JJTEXP){
+							t = (Token)temp2.jjtGetValue();
+							String type = checkExp(temp2, cs, null, FLAG_CLASS);
+							if (!expType.equals(type) && !("long".equals(expType) && "int".equals(type))){
+								String str = "Incompatible types: " + expType + " required, but " 
+									   + type + " found: line " + t.beginLine 
+									   + ", column " + t.beginColumn + ". ";
+								throw new SemanticException(str);
+							}
+						}
+						else if (temp2.getId() == JJTEXPLIST){
+							if (!"int[]".equals(expType) || !"long[]".equals(expType)){
+								String str = "Error occurs at line " + t.beginLine 
+								   + ", column " + t.beginColumn + ", Only int[] or long[] "
+								   + "can be assigned with an array. ";
+								throw new SemanticException(str);
+							}
+							String type = checkExpList(temp2, cs, null, FLAG_CLASS);
+							if (!expType.equals(type) && !("long[]".equals(expType) && "int[]".equals(type))){
+								String str = "Incompatible types: " + expType + " required, but " 
+								   + type + " found: line " + t.beginLine 
+								   + ", column " + t.beginColumn + ". ";
+								throw new SemanticException(str);
+							}
+						}
 					}
 				}
 				break;
@@ -272,83 +321,628 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
-	private void checkType(SimpleNode node, ClassSymbol cs, 
-			MethodSymbol ms) throws SemanticException{
+	private void checkType(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
+		lastSymbol = null;
 		int childrenSize = node.jjtGetNumChildren();
 		for (int i = 0; i < childrenSize; i++){
 			SimpleNode children = (SimpleNode)node.jjtGetChild(i);
 			switch (children.getId()){
 			case JJTPREDECL:
-				checkExp(children, cs, ms, EXP_ENTRY.PRE);
+				children = (SimpleNode)children.jjtGetChild(1);
+				checkExp(children, cs, ms, FLAG_PRE);
 				break;
 			case JJTPOSTDECL:
-				checkExp(children, cs, ms, EXP_ENTRY.POST);
+				children = (SimpleNode)children.jjtGetChild(1);
+				checkExp(children, cs, ms, FLAG_POST);
 				break;
 			case JJTSTATEMENT:
 				checkStatement(children, cs, ms);
 				break;
 			case JJTRETURN:
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	
-	private void checkExp(SimpleNode node, ClassSymbol cs, 
-			MethodSymbol ms, EXP_ENTRY flag) throws SemanticException{
-		int childrenSize = node.jjtGetNumChildren();
-		for (int i = 0; i < childrenSize; i++){
-			SimpleNode children = (SimpleNode)node.jjtGetChild(i);
-			switch (children.getId()){
-			case JJTID:
-				Token t = (Token)children.jjtGetValue();
-				String name = t.toString();
-				String type;
-				if (flag == EXP_ENTRY.PRE){
-					if ((type = ms.getParamsSymbolType(name)) != null){
-						
-					}
-					else if ((type = cs.getFieldSymbolType(name)) != null){
-						
-					}
-					else {
-						String str = "Error occurs at line " + t.beginLine 
-						   + ", column " + t.beginColumn + ", Varible " + name 
-						   + " isn't defined before the pre-condition. ";
+				children = (SimpleNode)node.jjtGetChild(i + 1);
+				String type = checkExp(children, cs, ms, FLAG_METHOD);
+				if (!ms.getType().equals(type)){
+					if (!("long".equals(ms.getType()) && "int".equals(type))){
+						Token t = (Token)children.jjtGetValue();
+						String str = "Incompatible types: " + ms.getType() + " required for "
+							   + "the method's return type, but " 
+							   + type + " found: line " + t.beginLine 
+							   + ", column " + t.beginColumn + ". ";
 						throw new SemanticException(str);
 					}
 				}
-				else if(flag == EXP_ENTRY.POST){
-					if ((type = ms.getLocalsSymbolType(name)) != null){
-						
-					}
-					else if ((type = ms.getParamsSymbolType(name)) != null){
-						
-					}
-					else if ((type = cs.getFieldSymbolType(name)) != null){
-						
-					}
-					else {
-						String str = "Error occurs at line " + t.beginLine 
-						   + ", column " + t.beginColumn + ", Varible " + name 
-						   + " isn't defined. ";
-						throw new SemanticException(str);
-					}
-				}
-				else{
-					
-				}
 				break;
 			default:
-				checkExp(children, cs, ms, flag);
 				break;
 			}
 		}
 	}
 	
 	private void checkStatement(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
+		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
+		switch (children.getId()){
+		case JJTVARDECL:
+			checkVarDecl(children, cs, ms);
+			break;
+		case JJTSTATEMENT:
+			checkStatement(children, cs, ms);
+			break;
+		case JJTIF:{
+			SimpleNode brother = (SimpleNode)node.jjtGetChild(1);
+			Token t = (Token)brother.jjtGetValue();
+			
+			String type = checkExp(brother, cs, ms, FLAG_METHOD);
+			if (!"boolean".equals(type)){
+				String str = "Incompatible types: boolean required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			
+			brother = (SimpleNode)node.jjtGetChild(2);
+			checkStatement(brother, cs, ms);
+			
+			brother = (SimpleNode)node.jjtGetChild(4);
+			checkStatement(brother, cs, ms);
+		}
+			break;
+		case JJTWHILE:{
+			SimpleNode brother = (SimpleNode)node.jjtGetChild(1);
+			Token t = (Token)brother.jjtGetValue();
+			
+			String type = checkExp(brother, cs, ms, FLAG_METHOD);
+			if (!"boolean".equals(type)){
+				String str = "Incompatible types: boolean required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			
+			brother = (SimpleNode)node.jjtGetChild(2);
+			checkStatement(brother, cs, ms);
+		}
+			break;
+		case JJTID:
+			SimpleNode brother = (SimpleNode)node.jjtGetChild(1);
+			if (brother.getId() == JJTID){
+				checkVarDecl(node, cs, ms);
+			}
+			else{
+				Token t = (Token)children.jjtGetValue();
+				String name = t.toString();
+				String expType = null;
+				if (ms.ifcontain(name, lastSymbol)){
+					expType = ms.getLocalsSymbolType(name);
+				}
+				if (expType == null){
+					expType = ms.getParamsSymbolType(name);
+					if (expType == null){
+						expType = cs.getFieldSymbolType(name);
+					}
+				}
+	
+				if (expType == null){
+					String str = "Error occurs at line " + t.beginLine 
+					   + ", column " + t.beginColumn + ", Varible " + name
+					   + " has not been defined yet. ";
+					throw new SemanticException(str);
+				}
+				
+				if (brother.getId() == JJTASSIGN) {
+					brother = (SimpleNode)node.jjtGetChild(2);
+					t = (Token)brother.jjtGetValue();
+					String type = checkExp(brother, cs, ms, FLAG_METHOD);
+					
+					if (!expType.equals(type) && !("long".equals(expType) && "int".equals(type))){
+						String str = "Incompatible types: " + expType + " required, but " 
+						   + type + " found: line " + t.beginLine 
+						   + ", column " + t.beginColumn + ". ";
+						throw new SemanticException(str);
+					}
+				}
+				else if (brother.getId() == JJTEXP){
+					if (!"int[]".equals(expType) || !"long[]".equals(expType)){
+						String str = "Incompatible types: int[] or long[] required, but " 
+						   + expType + " found: line " + t.beginLine 
+						   + ", column " + t.beginColumn + ". ";
+						throw new SemanticException(str);
+					}
+					expType = expType.replace("[]", "");
+					t = (Token)brother.jjtGetValue();
+					String type = checkExp(brother, cs, ms, FLAG_METHOD);
+					if (!"int".equals(type)){
+						String str = "Incompatible types: int required, but " 
+							   + type + " found: line " + t.beginLine 
+							   + ", column " + t.beginColumn + ". ";
+						throw new SemanticException(str);
+					}
+					
+					brother = (SimpleNode)node.jjtGetChild(3);
+					t = (Token)brother.jjtGetValue();
+					type = checkExp(brother, cs, ms, FLAG_METHOD);
+					if (!expType.equals(type)){
+						String str = "Incompatible types: " + expType +  " required, but " 
+							   + type + " found: line " + t.beginLine 
+							   + ", column " + t.beginColumn + ". ";
+						throw new SemanticException(str);
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
+	private void checkVarDecl(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
+		int childrenSize = node.jjtGetNumChildren();
+		for (int i = 0; i < childrenSize; i++){
+			SimpleNode children = (SimpleNode)node.jjtGetChild(i);
+			switch (children.getId()){
+			case JJTID:
+			case JJTTYPE:
+				if (i != 0){
+					break;
+				}
+				SimpleNode temp = (SimpleNode)node.jjtGetChild(i + 1);
+				Token t = (Token)temp.jjtGetValue();
+				String name = t.toString();
+				
+				lastSymbol = new Symbol();
+				lastSymbol.setName(name);
+				
+				if (i + 2 < childrenSize){
+					SimpleNode temp2 = (SimpleNode)node.jjtGetChild(i + 2);
+					
+					String expType = ms.getLocalsSymbolType(name);
+					if (expType == null){
+						expType = ms.getParamsSymbolType(name);
+					}
+					lastSymbol.setType(expType);
+					
+					temp2 = (SimpleNode)node.jjtGetChild(i + 3);
+					if (temp2.getId() == JJTEXP){
+						t = (Token)temp2.jjtGetValue();
+						String type = checkExp(temp2, cs, ms, FLAG_METHOD);
+						if (!expType.equals(type) && !("long".equals(expType) && "int".equals(type))){
+							String str = "Incompatible types: " + expType + " required, but " 
+								   + type + " found: line " + t.beginLine 
+								   + ", column " + t.beginColumn + ". ";
+							throw new SemanticException(str);
+						}
+					}
+					else if (temp2.getId() == JJTEXPLIST){
+						if (!"int[]".equals(expType) && !"long[]".equals(expType)){
+							String str = "Error occurs at line " + t.beginLine 
+							   + ", column " + t.beginColumn + ", Only int[] or long[] "
+							   + "can be assigned with an array. ";
+							throw new SemanticException(str);
+						}
+						String type = checkExpList(temp2, cs, ms, FLAG_METHOD);
+						if (!expType.equals(type) && !("long[]".equals(expType) && "int[]".equals(type))){
+							String str = "Incompatible types: " + expType + " required, but " 
+							   + type + " found: line " + t.beginLine 
+							   + ", column " + t.beginColumn + ". ";
+							throw new SemanticException(str);
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	private String checkExp(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		int childrenSize = node.jjtGetNumChildren();
+
+		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
+		switch (children.getId()){
+		case JJTNEW:{
+			//new ID()
+			if (childrenSize == 2){
+				SimpleNode sub = (SimpleNode)node.jjtGetChild(1);
+				Token t = (Token)sub.jjtGetValue();
+				String typeName = t.toString();
+				if (symbolTable.getClassSymbol(typeName) != null){
+					return typeName;
+				}
+				else {
+					String str = "Error occurs at line " + t.beginLine + ", column " 
+					   + t.beginColumn + ", Class " + typeName 
+					   + " isn't defined in the program. ";
+					throw new SemanticException(str);
+				}
+			}
+			//new int[4] or new long[4]
+			else if(childrenSize == 3){
+				SimpleNode sub = (SimpleNode)node.jjtGetChild(1);
+				String typeName = sub.jjtGetValue().toString() + "[]";
+				sub = (SimpleNode)node.jjtGetChild(2);
+				Token t = (Token)sub.jjtGetValue();
+				String tmpType = checkExp(sub, cs, ms, flag);
+				if (!"int".equals(tmpType)){
+					String str = "Incompatible types: int required, but " 
+					   + tmpType + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+					throw new SemanticException(str);
+				}
+				return typeName;
+			}
+		}
+			break;
+		case JJTLOWLEVELEXP:
+			return checkLowLevelExp(children, cs, ms, flag);
+		case JJTNOT:{
+			SimpleNode sub = (SimpleNode)node.jjtGetChild(1);
+			Token t = (Token)sub.jjtGetValue();
+			String type = checkExp(sub, cs, ms, flag);
+			if (!"boolean".equals(type)){
+				String str = "Incompatible types: boolean required, but " 
+				   + type + " found: line " + t.beginLine 
+				   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			return "boolean";
+		}
+		default:
+			break;
+		}
+		return null;
+	}
+	
+	private String checkLowLevelExp(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		int childrenSize = node.jjtGetNumChildren();
 		
+		int curPos = 0;
+		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
+		String type = checkHighLevelExp(children, cs, ms, flag);
+		String operater = ""; 
+		while (curPos + 2 < childrenSize){
+			Token t;
+			if (!"int".equals(type) && !"long".equals(type)
+				&& !"boolean".equals(type)){
+				t = (Token)children.jjtGetValue();
+				String str = "Error occurs at line " + t.beginLine 
+				   + ", column " + t.beginColumn + ", The user-defined type "
+				   + type + " can't be an operand. ";
+				throw new SemanticException(str);
+			}
+			SimpleNode children1 = (SimpleNode)node.jjtGetChild(curPos + 1);
+			SimpleNode children2 = (SimpleNode)node.jjtGetChild(curPos + 2);
+			switch (children1.getId()){
+			case JJTAND:
+			case JJTOR:{
+				String type2 = checkHighLevelExp(children2, cs, ms, flag);
+				if (!"boolean".equals(type) || !"boolean".equals(type2)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+						   + ", column " + t.beginColumn + ", The operator '"
+						   + t.image + "' is undefined for the types "
+						   + type + ", " + type2;
+					throw new SemanticException(str);
+				}
+				if ("".equals(operater)){
+					operater = "logic";
+				}
+				else if (!"logic".equals(operater)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+					   + ", column " + t.beginColumn + ", an expression can't contains "
+					   + "the arithmetic operator '"
+					   + t.image + "' and the logic operator at the same time. ";
+					throw new SemanticException(str);
+				}
+				type = "boolean";
+			}
+				break;
+			case JJTPLUS:
+			case JJTMINUS:{
+				String type2 = checkHighLevelExp(children2, cs, ms, flag);
+				if ("boolean".equals(type) || "boolean".equals(type2)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+						   + ", column " + t.beginColumn + ", The operator '"
+						   + t.image + "' is undefined for the types "
+						   + type + ", " + type2;
+					throw new SemanticException(str);
+				}
+				if ("".equals(operater)){
+					operater = "arithmetic";
+				}
+				else if (!"arithmetic".equals(operater)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+					   + ", column " + t.beginColumn + ", an expression can't contains "
+					   + "the logic operator '"
+					   + t.image + "' and the arithmetic operator at the same time. ";
+					throw new SemanticException(str);
+				}
+				if ("long".equals(type) || "long".equals(type2)){
+					type = "long";
+				}
+				else{
+					type = "int";
+				}
+			}
+				break;
+			default:
+				break;
+			}
+			curPos += 2;
+		}
+		return type;
+	}
+	
+	private String checkHighLevelExp(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		int childrenSize = node.jjtGetNumChildren();
+		
+		int curPos = 0;
+		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
+		String type = checkUnaryExp(children, cs, ms, flag);
+		String operater = ""; 
+		while (curPos + 2 < childrenSize){
+			Token t;
+			if (!"int".equals(type) && !"long".equals(type)
+				&& !"boolean".equals(type)){
+				t = (Token)children.jjtGetValue();
+				String str = "Error occurs at line " + t.beginLine 
+				   + ", column " + t.beginColumn + ", The user-defined type "
+				   + type + " can't be an operand. ";
+				throw new SemanticException(str);
+			}
+			SimpleNode children1 = (SimpleNode)node.jjtGetChild(curPos + 1);
+			SimpleNode children2 = (SimpleNode)node.jjtGetChild(curPos + 2);
+			switch (children1.getId()){
+			case JJTLESSTHAN:
+			case JJTLARGERTHAN:{
+				String type2 = checkUnaryExp(children2, cs, ms, flag);
+				if ("boolean".equals(type) || "boolean".equals(type2)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+						   + ", column " + t.beginColumn + ", The operator '"
+						   + t.image + "' is undefined for the types "
+						   + type + ", " + type2;
+					throw new SemanticException(str);
+				}
+				if ("".equals(operater)){
+					operater = "logic";
+				}
+				else if (!"logic".equals(operater)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+					   + ", column " + t.beginColumn + ", an expression can't contains "
+					   + "the arithmetic operator '"
+					   + t.image + "' and the logic operator at the same time. ";
+					throw new SemanticException(str);
+				}
+				type = "boolean";
+			}
+				break;
+			case JJTMULTI:
+			case JJTDIVISION:{
+				String type2 = checkUnaryExp(children2, cs, ms, flag);
+				if ("boolean".equals(type) || "boolean".equals(type2)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+						   + ", column " + t.beginColumn + ", The operator '"
+						   + t.image + "' is undefined for the types "
+						   + type + ", " + type2;
+					throw new SemanticException(str);
+				}
+				if ("".equals(operater)){
+					operater = "arithmetic";
+				}
+				else if (!"arithmetic".equals(operater)){
+					t = (Token)children1.jjtGetValue();
+					String str = "Error occurs at line " + t.beginLine 
+					   + ", column " + t.beginColumn + ", an expression can't contains "
+					   + "the logic operator '"
+					   + t.image + "' and the arithmetic operator at the same time. ";
+					throw new SemanticException(str);
+				}
+				if ("long".equals(type) || "long".equals(type2)){
+					type = "long";
+				}
+				else{
+					type = "int";
+				}
+			}
+				break;
+			default:
+				break;
+			}
+			curPos += 2;
+		}
+		return type;
+	}
+	
+	private String checkUnaryExp(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		int childrenSize = node.jjtGetNumChildren();
+		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
+		String type = "";
+		Token t;
+		switch (children.getId()){
+		case JJTINT_LITERAL:
+			type = "int";
+			break;
+		case JJTLONG_LITERAL:
+			type = "long";
+			break;
+		case JJTTRUE:
+		case JJTFALSE:
+			type = "boolean";
+			break;
+		case JJTID:
+			t = (Token)children.jjtGetValue();
+			String name = t.toString();
+			if (symbolTable.getClassSymbol(name) != null){
+				String str = "Error occurs at line " + t.beginLine + ", column " 
+				   + t.beginColumn + ", Class " + name 
+				   + " can't be used directly, maybe you should define an object. ";
+				throw new SemanticException(str);
+			}
+			boolean found = false;
+			if ((flag & FLAG_PRE) == FLAG_PRE){
+				type = ms.getParamsSymbolType(name);
+				if (type != null){
+					found = true;
+				}
+			}
+			if ((flag & FLAG_METHOD) == FLAG_METHOD && !found){
+				if (ms.ifcontain(name, lastSymbol)){
+					type = ms.getLocalsSymbolType(name);
+					found = true;
+				}
+			}
+			if ((flag & FLAG_POST) == FLAG_POST && !found){
+				type = ms.getLocalsSymbolType(name);
+				if (type != null){
+					found = true;
+				}
+			}
+			if ((flag & FLAG_CLASS) == FLAG_CLASS && !found){
+				type = cs.getFieldSymbolType(name);
+				if (type == null && !found){
+					String str = "Error occurs at line " + t.beginLine + ", column " 
+					   + t.beginColumn + ", Varible " + name 
+					   + " isn't defined in the program. ";
+					if ((flag & FLAG_PRE) == FLAG_PRE){
+						str = "Error occurs at line " + t.beginLine + ", column " 
+						   + t.beginColumn + ", Varible " + name 
+						   + " isn't defined before the pre-declaration. ";
+					}
+					throw new SemanticException(str);
+				}
+			}
+			break;
+		case JJTTHIS:
+			type = cs.getName();
+			break;
+		case JJTEXP:
+			type = checkExp(children, cs, ms, flag);
+			break;
+		default:
+			break;
+		}
+		// id[1]
+		if (childrenSize == 2){
+			if (!"int[]".equals(type) && !"long[]".equals(type)){
+				t = (Token)children.jjtGetValue();
+				String str = "Incompatible types: int[] or long[] required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+
+			SimpleNode brother = (SimpleNode)node.jjtGetChild(1);
+			String temp = checkExp(brother, cs, ms, flag);
+			if ("long".equals(temp)){
+				t = (Token)brother.jjtGetValue();
+				String str = "Incompatible types: Can't convert from long to int: " 
+					+ "line " + t.beginLine + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			if (!"int".equals(temp)){
+				t = (Token)brother.jjtGetValue();
+				String str = "Incompatible types: int required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			
+			if ("int[]".equals(type)){
+				type = "int";
+			}
+			else if ("long[]".equals(type)){
+				type = "long";
+			}
+		}
+		// .length
+		else if (childrenSize == 3){
+			if (!"int[]".equals(type) && !"long[]".equals(type)){
+				t = (Token)children.jjtGetValue();
+				String str = "Incompatible types: int[] or long[] required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			type = "int";
+		}
+		// .method()
+		else if (childrenSize == 4) {
+			ClassSymbol tempCs = symbolTable.getClassSymbol(type);
+			if (tempCs == null){
+				t = (Token)children.jjtGetValue();
+				String str = "Incompatible types: a class varible required, but " 
+					   + type + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+			SimpleNode brother = (SimpleNode)node.jjtGetChild(2);
+			t = (Token)brother.jjtGetValue();
+			String methodName = t.toString();
+			brother = (SimpleNode)node.jjtGetChild(3);
+			ArrayList<String> params = checkParams(brother, cs, ms, flag);
+			
+			MethodSymbol mss = tempCs.ifMethodExist(methodName, params);
+			// inherit?
+			if (mss == null){
+				String paramStr = "";
+				for (int i = 0; i < params.size() - 1; i++){
+					paramStr += params.get(i) + ", ";
+				}
+				paramStr += params.get(params.size() - 1);
+				
+				String str = "Error occurs at line " + t.beginLine + ", column " 
+				   + t.beginColumn + ", There is no method " + methodName + "(" + paramStr + ")"
+				   + " isn't defined in the Class " + cs.getName() + ". ";
+				throw new SemanticException(str);
+			}
+			type = mss.getType();
+		}
+		return type;
+	}
+	
+	private String checkExpList(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		String type = "";
+		int childrenSize = node.jjtGetNumChildren();
+		for (int i = 0; i < childrenSize; i++){
+			SimpleNode children = (SimpleNode)node.jjtGetChild(i);
+			Token t = (Token)children.jjtGetValue();
+			
+			String tempType = checkExp(children, cs, ms, flag);
+				
+			if ("long".equals(tempType)){
+				type = "long";
+			}
+			else if ("int".equals(tempType)){
+				if ("".equals(type)) {
+					type = "int";
+				}
+			}
+			else {
+				String str = "Incompatible types: int or long required, but " 
+					   + tempType + " found: line " + t.beginLine 
+					   + ", column " + t.beginColumn + ". ";
+				throw new SemanticException(str);
+			}
+		}
+		
+		return type + "[]";
+	}
+	
+	private ArrayList<String> checkParams(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
+		ArrayList<String> params = new ArrayList<String>();
+		
+		int childrenSize = node.jjtGetNumChildren();
+		for (int i = 0; i < childrenSize; i++){
+			SimpleNode children = (SimpleNode)node.jjtGetChild(i);
+			params.add(checkExp(children, cs, ms, flag));
+		}
+		
+		return params;
 	}
 	
 	public String getSymbolTableString(){

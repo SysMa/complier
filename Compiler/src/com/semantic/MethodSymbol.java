@@ -75,6 +75,9 @@ public class MethodSymbol extends Symbol {
 	
 	// before the symbol if the locals symbol exists
 	public boolean ifcontain(String name, Symbol before){
+		if (before == null){
+			return false;
+		}
 		for (int i = 0; i < localsSymbolTable.size(); i++){
 			Symbol s = localsSymbolTable.get(i);
 			if (s.getName().equals(name)){
