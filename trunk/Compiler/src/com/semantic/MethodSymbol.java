@@ -15,7 +15,6 @@ public class MethodSymbol extends Symbol {
 	public MethodSymbol(){
 		paramsSymbolTable = new ArrayList<Symbol>();
 		localsSymbolTable = new ArrayList<Symbol>();
-		methodCount = 0;
 	}
 	public MethodSymbol(String name, String type){
 		super(name, type);
