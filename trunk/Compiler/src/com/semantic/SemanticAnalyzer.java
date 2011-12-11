@@ -747,7 +747,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					String str = "Error occurs at line " + t.beginLine 
 						   + ", column " + t.beginColumn + ", The operator '"
 						   + t.image + "' is undefined for the types "
-						   + type + ", " + type2;
+						   + type + ", " + type2 + ".";
 					throw new SemanticException(str);
 				}
 				if ("".equals(operater)){
@@ -772,7 +772,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					String str = "Error occurs at line " + t.beginLine 
 						   + ", column " + t.beginColumn + ", The operator '"
 						   + t.image + "' is undefined for the types "
-						   + type + ", " + type2;
+						   + type + ", " + type2 + ".";
 					throw new SemanticException(str);
 				}
 				if ("".equals(operater)){

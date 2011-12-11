@@ -25,5 +25,4 @@ public class SemanticException extends Exception {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
-
 }
