@@ -21,6 +21,9 @@ public class MethodSymbol extends Symbol {
 		super(name, type);
 		paramsSymbolTable = new ArrayList<Symbol>();
 		localsSymbolTable = new ArrayList<Symbol>();
+	}
+	
+	static public void refreshMethodCount(){
 		methodCount = 0;
 	}
 	
