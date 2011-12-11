@@ -18,12 +18,14 @@ public class ClassSymbol extends Symbol {
 		fieldSymbolTable = new HashMap<String, String>();
 		methodSymbolTable = new ArrayList<MethodSymbol>();
 		parent = null;
+		MethodSymbol.refreshMethodCount();
 	}
 	public ClassSymbol(String name){
 		super(name, "class");
 		fieldSymbolTable = new HashMap<String, String>();
 		methodSymbolTable = new ArrayList<MethodSymbol>();
 		parent = null;
+		MethodSymbol.refreshMethodCount();
 	}
 	
 	public ClassSymbol getParent() {
@@ -58,7 +60,7 @@ public class ClassSymbol extends Symbol {
 	public MethodSymbol getMethodSymbol(String name, int id){
 		for (int i = 0; i < methodSymbolTable.size(); i++){
 			MethodSymbol ms = methodSymbolTable.get(i);
-			if (ms.getName().endsWith(name) && ms.getId() == id){
+			if (ms.getName().equals(name) && ms.getId() == id){
 				return ms;
 			}
 		}

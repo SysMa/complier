@@ -12,14 +12,19 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 	private SimpleNode simpleNode;
 	private SymbolTable symbolTable;
 	
-	private int FLAG_CLASS	= 0x0001;
-	private int FLAG_PRE	= 0x0003;
-	private int FLAG_METHOD = 0x0007;
-	private int FLAG_POST	= 0x000F;
+	private int FLAG_CLASS	= 0x0001;	// get symbol from the class field symbol table
+	private int FLAG_PRE	= 0x0003;	// get symbol from the method param symbol table 
+										// and the class field symbol table
+	private int FLAG_METHOD = 0x0007;	// get symbol from the method param symbol table 
+										// and the local symbol table before The specical symbol
+										// and the class field symbol table
+	private int FLAG_POST	= 0x000F;	// get symbol from the method param symbol table 
+										// and the local symbol table
+										// and the class field symbol table
 	
 	private int curMethodCount = 0;
 	
-	private Symbol lastSymbol = null;
+	private Symbol lastSymbol = null;	// last symbol defined
 
 	public SemanticAnalyzer(SimpleNode simpleNode){
 		this.simpleNode = simpleNode;
@@ -218,8 +223,11 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// the entry for type checking
 	public void checkType() throws SemanticException{
 		int childrenSize = simpleNode.jjtGetNumChildren();
+		
+		// get class's parent class
 		for (int i = 0; i < childrenSize; i++){
 			SimpleNode children = (SimpleNode)simpleNode.jjtGetChild(i);
 			switch (children.getId()){
@@ -247,6 +255,22 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 						}
 					}
 				}
+				break;
+			default:
+				break;
+			}
+		}
+		
+		for (int i = 0; i < childrenSize; i++){
+			SimpleNode children = (SimpleNode)simpleNode.jjtGetChild(i);
+			switch (children.getId()){
+			case JJTMAINCLASS:
+			case JJTCLASSDECL:
+				curMethodCount = 0;
+				SimpleNode subChild = (SimpleNode)children.jjtGetChild(1);
+				Token t = (Token)subChild.jjtGetValue();
+				String name = t.toString();
+				ClassSymbol cs = symbolTable.getClassSymbol(name);
 				checkType(children, cs);
 				break;
 			default:
@@ -255,6 +279,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// do the type checking in the class
 	private void checkType(SimpleNode node, ClassSymbol cs) throws SemanticException{
 		int childrenSize = node.jjtGetNumChildren();
 		for (int i = 0; i < childrenSize; i++){
@@ -321,6 +346,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// do the type checking in the method
 	private void checkType(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
 		lastSymbol = null;
 		int childrenSize = node.jjtGetNumChildren();
@@ -358,6 +384,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// check a statement's type
 	private void checkStatement(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
 		SimpleNode children = (SimpleNode)node.jjtGetChild(0);
 		switch (children.getId()){
@@ -441,7 +468,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					}
 				}
 				else if (brother.getId() == JJTEXP){
-					if (!"int[]".equals(expType) || !"long[]".equals(expType)){
+					if (!"int[]".equals(expType) && !"long[]".equals(expType)){
 						String str = "Incompatible types: int[] or long[] required, but " 
 						   + expType + " found: line " + t.beginLine 
 						   + ", column " + t.beginColumn + ". ";
@@ -460,7 +487,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 					brother = (SimpleNode)node.jjtGetChild(3);
 					t = (Token)brother.jjtGetValue();
 					type = checkExp(brother, cs, ms, FLAG_METHOD);
-					if (!expType.equals(type)){
+					if (!expType.equals(type) && !("long".equals(expType) && "int".equals(type))){
 						String str = "Incompatible types: " + expType +  " required, but " 
 							   + type + " found: line " + t.beginLine 
 							   + ", column " + t.beginColumn + ". ";
@@ -474,6 +501,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// check the varible declaration.
 	private void checkVarDecl(SimpleNode node, ClassSymbol cs, MethodSymbol ms) throws SemanticException{
 		int childrenSize = node.jjtGetNumChildren();
 		for (int i = 0; i < childrenSize; i++){
@@ -534,6 +562,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 		}
 	}
 	
+	// check the expression and return the expression's type
 	private String checkExp(SimpleNode node, ClassSymbol cs, MethodSymbol ms, int flag) throws SemanticException{
 		int childrenSize = node.jjtGetNumChildren();
 
@@ -886,9 +915,19 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 			brother = (SimpleNode)node.jjtGetChild(3);
 			ArrayList<String> params = checkParams(brother, cs, ms, flag);
 			
-			MethodSymbol mss = tempCs.ifMethodExist(methodName, params);
-			// inherit?
-			if (mss == null){
+			// inherit.
+			boolean found = false;
+			while (tempCs != null){
+				MethodSymbol mss = tempCs.ifMethodExist(methodName, params);
+				if (mss != null){
+					found = true;
+					type = mss.getType();
+					break;
+				}
+				tempCs = tempCs.getParent();
+			}
+			
+			if (!found){
 				String paramStr = "";
 				for (int i = 0; i < params.size() - 1; i++){
 					paramStr += params.get(i) + ", ";
@@ -897,10 +936,10 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 				
 				String str = "Error occurs at line " + t.beginLine + ", column " 
 				   + t.beginColumn + ", There is no method " + methodName + "(" + paramStr + ")"
-				   + " isn't defined in the Class " + cs.getName() + ". ";
+				   + " defined in the Class " + cs.getName() + ". ";
 				throw new SemanticException(str);
 			}
-			type = mss.getType();
+			
 		}
 		return type;
 	}
