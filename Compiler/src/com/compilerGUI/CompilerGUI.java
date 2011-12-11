@@ -280,7 +280,14 @@ public class CompilerGUI {
 					catch (SemanticException se){
 						text_analysis.setVisible(true);
 						sashForm_1.layout();
-						text_analysis.setText(se.getMessage());
+						
+						String temp = se.getMessage();
+						int begin = temp.indexOf("line");
+						String substr = temp.substring(begin+5, temp.indexOf(",", begin));
+						int line = Integer.parseInt(substr);
+						text_sourceCode.setLineBackground( line-1,1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+						
+						text_analysis.setText(se.getMessage() + "The number is " + line);
 					}
 					catch (Exception e2)
 				    {
@@ -323,6 +330,11 @@ public class CompilerGUI {
 		textChanged = false;
 		
 		text_sourceCode = new StyledText(sashForm, SWT.BORDER);
+		text_sourceCode.setText("Code here.");
+		text_sourceCode.setRightMargin(1);
+		text_sourceCode.setIndent(1);
+		text_sourceCode.setLeftMargin(1);
+		text_sourceCode.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		
 		sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
