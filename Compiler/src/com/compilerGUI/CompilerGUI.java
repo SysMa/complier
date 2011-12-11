@@ -1,12 +1,5 @@
 package com.compilerGUI;
 
-import com.lexical.LexicalAnalyzer;
-import com.lexical.Token;
-import com.parse.Parser;
-import com.parse.SimpleNode;
-import com.semantic.SemanticAnalyzer;
-import com.semantic.SemanticException;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -21,23 +14,29 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.lexical.LexicalAnalyzer;
+import com.lexical.Token;
+import com.parse.Parser;
+import com.parse.SimpleNode;
+import com.semantic.SemanticAnalyzer;
+import com.semantic.SemanticException;
 
 
 public class CompilerGUI {
@@ -46,7 +45,7 @@ public class CompilerGUI {
 	protected Shell sematicshell;
 	private SashForm sashForm_1;
 	private Tree symbolTree;
-	private Text text_sourceCode;
+	private StyledText text_sourceCode;
 	private Text text_analysis;
 	private Text text_statistic;
 	
@@ -321,18 +320,9 @@ public class CompilerGUI {
 		menu_helpFrame_about.setText("\u5173\u4E8E");
 		
 		SashForm sashForm = new SashForm(shell, SWT.NONE);
-		
-		text_sourceCode = new Text(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
-		text_sourceCode.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		text_sourceCode.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				lexicalOk = false;
-				parseOk = false;
-				textChanged = true;
-			}
-		});
-		text_sourceCode.setText("Take an XYZ program as the input.");
 		textChanged = false;
+		
+		text_sourceCode = new StyledText(sashForm, SWT.BORDER);
 		
 		sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 		
