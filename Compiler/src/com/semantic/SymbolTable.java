@@ -12,6 +12,10 @@ public class SymbolTable {
 		classSymbolTable = new ArrayList<ClassSymbol>();
 	}
 
+	public ArrayList<ClassSymbol> getClassSymbolTable() {
+		return classSymbolTable;
+	}
+
 	public ClassSymbol getClassSymbol(String name) {
 		for (int i = 0; i < classSymbolTable.size(); i++){
 			ClassSymbol cs = classSymbolTable.get(i);

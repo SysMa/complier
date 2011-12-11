@@ -261,6 +261,21 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 			}
 		}
 		
+		// check cyclic inheritance
+		ArrayList<ClassSymbol> csList = symbolTable.getClassSymbolTable();
+		for (int i = 0; i < csList.size(); i++){
+			ClassSymbol cs = csList.get(i);
+			ClassSymbol temp = cs.getParent();
+			while (temp != null){
+				if (temp.getName().equals(cs.getName())){
+					String str = "Error occurs, cyclic inheritance involving "
+						+ cs.getName() + ". ";
+					throw new SemanticException(str);
+				}
+				temp = temp.getParent();
+			}
+		}
+		
 		for (int i = 0; i < childrenSize; i++){
 			SimpleNode children = (SimpleNode)simpleNode.jjtGetChild(i);
 			switch (children.getId()){
