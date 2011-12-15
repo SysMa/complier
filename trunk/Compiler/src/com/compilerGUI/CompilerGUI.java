@@ -48,6 +48,7 @@ public class CompilerGUI {
 	private StyledText text_sourceCode;
 	private Text text_analysis;
 	private Text text_statistic;
+	private int line = -1;
 	
 	private boolean textChanged = false;
 	private boolean lexicalOk = false;
@@ -171,6 +172,10 @@ public class CompilerGUI {
 				symbolTree.setVisible(false);
 				sashForm_1.layout();
 				
+				if (line != -1){
+					text_sourceCode.setLineBackground( line-1,1, Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+				}
+				
 				String input = text_sourceCode.getText();
 				HashMap<String, Integer> tokenCountMap = new HashMap<String, Integer>();
 				StringBuffer tokenStr = new StringBuffer("这是词法分析结果:\n");
@@ -285,7 +290,7 @@ public class CompilerGUI {
 						int begin = temp.indexOf("line");
 						if (begin != -1){
 							String substr = temp.substring(begin+5, temp.indexOf(",", begin));
-							int line = Integer.parseInt(substr);
+							line = Integer.parseInt(substr);
 							text_sourceCode.setLineBackground( line-1,1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 						}
 						text_analysis.setText(se.getMessage());
@@ -330,7 +335,7 @@ public class CompilerGUI {
 		SashForm sashForm = new SashForm(shell, SWT.NONE);
 		textChanged = false;
 		
-		text_sourceCode = new StyledText(sashForm, SWT.BORDER);
+		text_sourceCode = new StyledText(sashForm, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		text_sourceCode.setText("Code here.");
 		text_sourceCode.setRightMargin(1);
 		text_sourceCode.setIndent(1);
