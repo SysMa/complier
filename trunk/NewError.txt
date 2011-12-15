@@ -1,0 +1,29 @@
+class Factorial {
+	static void main() {
+		int [] x <= [5, 10, 15, 20];
+		long abc <= 1 + x[0];
+		ExtendsFac fac <= new ExtendsFac();
+		int result <= fac.callComputeFac(temp);
+		result <= fac.callComputeFac(15);
+	}
+}
+class Fac {
+	int ComputeFac(int num) {
+    	pre: num > 0;
+   		post: num_aux > 0;
+       	int num_aux;
+		if (num > 1)
+            num_aux <= num * (this.ComputeFac(num-1));
+		else
+			num_aux <= 1;
+		return num_aux;
+	}
+}
+class ExtendsFac extends Fac{
+	int callComputeFac(int i) {
+		pre: i > 0;
+		post: i > 0;
+		int x <= this.ComputeFac(i);
+		return x;
+	}
+}
