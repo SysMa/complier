@@ -283,11 +283,12 @@ public class CompilerGUI {
 						
 						String temp = se.getMessage();
 						int begin = temp.indexOf("line");
-						String substr = temp.substring(begin+5, temp.indexOf(",", begin));
-						int line = Integer.parseInt(substr);
-						text_sourceCode.setLineBackground( line-1,1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-						
-						text_analysis.setText(se.getMessage() + "The number is " + line);
+						if (begin != -1){
+							String substr = temp.substring(begin+5, temp.indexOf(",", begin));
+							int line = Integer.parseInt(substr);
+							text_sourceCode.setLineBackground( line-1,1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+						}
+						text_analysis.setText(se.getMessage());
 					}
 					catch (Exception e2)
 				    {

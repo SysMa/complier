@@ -334,7 +334,7 @@ public class SemanticAnalyzer implements ParserTreeConstants{
 							}
 						}
 						else if (temp2.getId() == JJTEXPLIST){
-							if (!"int[]".equals(expType) || !"long[]".equals(expType)){
+							if (!"int[]".equals(expType) && !"long[]".equals(expType)){
 								String str = "Error occurs at line " + t.beginLine 
 								   + ", column " + t.beginColumn + ", Only int[] or long[] "
 								   + "can be assigned with an array. ";
