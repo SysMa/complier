@@ -1,0 +1,28 @@
+class Factorial {
+	static void main() {
+		long [] x <=[5, 10, 15, 20];
+		
+		Fac fac<=new Fac();
+		int result<=fac.ComputeFac(10);
+		result<=fac.ComputeFac(15);
+		int list <= fac.get(1);
+	}
+}
+class Fac {
+	int [] list <= [2, 4, 3, 2, 5, 2, 3, 2];	//Why the program will give us an error message here?
+	int get(int i) {
+		pre: i > 0;
+		post: i > 0;
+		return list[i];
+	}
+	int ComputeFac(int num) {
+    		pre: num > 0;
+   		post: num_aux>0;
+       		int num_aux;
+		if (num > 1)
+            		num_aux <= num * (this.ComputeFac(num-1));
+		else
+			num_aux <= 1;
+		return num_aux;
+	}
+}
